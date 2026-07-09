@@ -1,0 +1,69 @@
+
+> react-example@0.0.0 dev
+> next dev -p 3000 -H 0.0.0.0
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+✓ Ready in 765ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+It looks like you're trying to use TypeScript but do not have the required package(s) installed.
+Installing dependencies
+
+If you are not trying to use TypeScript, please remove the tsconfig.json file from your package root (and any TypeScript files in your app and pages directories).
+
+
+Installing devDependencies (npm):
+- @types/react
+
+
+added 5 packages, and audited 255 packages in 5s
+
+45 packages are looking for funding
+  run `npm fund` for details
+
+2 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- strict was set to false
+  	- incremental was set to true
+  	- include was set to ['next-env.d.ts', '.next/types/**/*.ts', '.next/dev/types/**/*.ts', '**/*.mts', '**/*.ts', '**/*.tsx']
+  	- plugins was updated to add { name: 'next' }
+  	- strictNullChecks was set to true
+  	- exclude was set to ['node_modules']
+
+  The following mandatory changes were made to your tsconfig.json:
+
+  	- esModuleInterop was set to true (requirement for SWC / babel)
+  	- resolveJsonModule was set to true (to match webpack resolution)
+
+
+○ Compiling / ...
+⨯ ./src/app/layout.tsx:3:1
+Module not found: Can't resolve './globals.css'
+  [90m1 |[0m [36mimport[0m [36mtype[0m { [33mMetadata[0m } [36mfrom[0m [32m"next"[0m;
+  [90m2 |[0m [36mimport[0m { [33mInter[0m, [33mSpace_Grotesk[0m, [33mJetBrains_Mono[0m } [36mfrom[0m [32m"next/font/google"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m [32m"./globals.css"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m [36mimport[0m [33mPublicLayoutClient[0m [36mfrom[0m [32m"@/components/layouts/PublicLayoutClient"[0m;
+  [90m5 |[0m
+  [90m6 |[0m [36mexport[0m [36mconst[0m metadata: [33mMetadata[0m = {
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ HEAD / 500 in 9.7s (next.js: 9.5s, application-code: 223ms)
