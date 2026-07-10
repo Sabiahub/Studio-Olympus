@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Studio Olympus",
-  description: "Estúdio de Tatuagem Clássica e Contemporânea",
+  description: "O Melhor Estúdio de Tatuagem de Belo Horizonte",
 };
 
 export default function RootLayout({

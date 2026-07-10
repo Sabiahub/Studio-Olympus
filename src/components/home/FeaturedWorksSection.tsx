@@ -12,7 +12,7 @@ export default function FeaturedWorksSection({ works }: { works: any[] }) {
             <div className="w-16 h-[1px] bg-olympus-gold"></div>
           </div>
           <p className="font-sans text-sm text-olympus-white/60 max-w-md font-light">
-            Projetos exclusivos e de grande escala, desenvolvidos sob medida por nossos artistas residentes.
+            Projetos exclusivos desenvolvidos sob medida.
           </p>
         </div>
       </div>

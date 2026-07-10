@@ -39,11 +39,9 @@ export default function AboutSection({ studio }: { studio: any }) {
           <div className="w-full md:w-1/2">
             <h2 className="font-serif text-2xl md:text-4xl text-olympus-gold mb-4 uppercase tracking-wider">A Arte Encontra a Eternidade</h2>
             <p className="font-sans text-sm md:text-base text-olympus-white/80 leading-relaxed mb-4 font-light">
-              O Studio Olympus é mais do que um espaço de tatuagem; é um refúgio dedicado à expressão artística definitiva. Localizado no coração de Belo Horizonte, unimos técnicas clássicas a visões contemporâneas.
+              Artistas que transformam técnica, identidade e precisão em tatuagens que marcam histórias.
             </p>
-            <p className="font-sans text-sm md:text-base text-olympus-white/80 leading-relaxed font-light">
-              Nossos artistas residentes e convidados compartilham o mesmo compromisso com a excelência, biossegurança rigorosa e o respeito pela sua história traduzida em pele.
-            </p>
+            
           </div>
         </div>
       </div>
