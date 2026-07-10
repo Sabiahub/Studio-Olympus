@@ -4,14 +4,14 @@ import { useEffect, useRef } from 'react';
 
 export default function FeaturedWorksSection({ works }: { works: any[] }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const section1Ref = useRef<HTMLDivElement>(null);
-  const layersRef = useRef<(HTMLDivElement | null)[]>([]);
+  const section1Ref = useRef<HTMLElement>(null);
+  const layersRef = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     if (!section1Ref.current || works.length <= 1) return;
 
     const section1 = section1Ref.current;
-    const layerRefs = layersRef.current.filter(Boolean) as HTMLDivElement[];
+    const layerRefs = layersRef.current.filter(Boolean) as HTMLElement[];
     
     // We get the initial top position relative to the document
     const rect = section1.getBoundingClientRect();
