@@ -7,3 +7,9 @@ coverage/
 .env*
 !.env.example
 .next/
+
+# Ignore local backups, seeds and picture uploads
+backup-studio-olympus.zip
+public/Pictures/
+seed_featured.cjs
+test-supabase.cjs
