@@ -188,8 +188,9 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$supabase$2d$js$2f$dist$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/@supabase/supabase-js/dist/index.mjs [app-ssr] (ecmascript) <locals>");
 ;
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://placeholder-url.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabaseUrlRaw = ("TURBOPACK compile-time value", "zuxlessvldwkcscbmueg") || process.env.VITE_SUPABASE_URL || 'https://placeholder-url.supabase.co';
+const supabaseUrl = supabaseUrlRaw.startsWith('http') ? supabaseUrlRaw : `https://${supabaseUrlRaw}.supabase.co`;
+const supabaseKey = ("TURBOPACK compile-time value", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eGxlc3N2bGR3a2NzY2JtdWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2Mjg5MDEsImV4cCI6MjA5OTIwNDkwMX0.42vM8QaLzSYuC9NQLaNSKGZj-3wt4_miyf54Z-miMJc") || process.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
 const supabase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$supabase$2d$js$2f$dist$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["createClient"])(supabaseUrl, supabaseKey);
 }),
 "[project]/src/components/home/TattoosSection.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {

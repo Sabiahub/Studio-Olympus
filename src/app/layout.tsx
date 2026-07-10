@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import PublicLayoutClient from "@/components/layouts/PublicLayoutClient";
 
 export const metadata: Metadata = {
   title: "Studio Olympus",
@@ -16,9 +15,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="scroll-smooth">
       <body>
-        <PublicLayoutClient>
-          {children}
-        </PublicLayoutClient>
+        {children}
       </body>
     </html>
   );

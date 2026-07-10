@@ -8,28 +8,53 @@ import Link from 'next/link';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<any>(null);
+  const [role, setRole] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       if (!session && !pathname?.includes('/login')) {
         router.push('/admin/login');
+      } else if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        if (profile) {
+          setRole(profile.role);
+        }
       }
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (!session && !pathname?.includes('/login')) {
         router.push('/admin/login');
+      } else if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        if (profile) {
+          setRole(profile.role);
+        }
       }
     });
 
     return () => subscription.unsubscribe();
   }, [router, pathname]);
+
+  useEffect(() => {
+    if (role === 'editor' && pathname === '/admin/users') {
+      router.push('/admin');
+    }
+  }, [role, pathname, router]);
 
   if (!session) {
     // If not on login page and no session, we return null while redirecting
@@ -70,10 +95,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="p-4 border-t border-olympus-gold/10 flex flex-col gap-2">
-          <Link href="/admin/users" className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${pathname === '/admin/users' ? 'bg-olympus-gold/10 text-olympus-gold border border-olympus-gold/20' : 'text-olympus-white/70 hover:bg-olympus-gold/5 hover:text-olympus-gold'}`}>
-            <Users size={18} />
-            <span className="font-sans text-sm uppercase tracking-wider">Usuários</span>
-          </Link>
+          {role === 'admin' && (
+            <Link href="/admin/users" className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${pathname === '/admin/users' ? 'bg-olympus-gold/10 text-olympus-gold border border-olympus-gold/20' : 'text-olympus-white/70 hover:bg-olympus-gold/5 hover:text-olympus-gold'}`}>
+              <Users size={18} />
+              <span className="font-sans text-sm uppercase tracking-wider">Usuários</span>
+            </Link>
+          )}
           <Link href="/admin/settings" className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${pathname === '/admin/settings' ? 'bg-olympus-gold/10 text-olympus-gold border border-olympus-gold/20' : 'text-olympus-white/70 hover:bg-olympus-gold/5 hover:text-olympus-gold'}`}>
             <Settings size={18} />
             <span className="font-sans text-sm uppercase tracking-wider">Configurações</span>
@@ -95,3 +122,4 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
+

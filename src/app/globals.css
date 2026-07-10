@@ -33,7 +33,7 @@
 /* PURE CSS MENU */
 [type="checkbox"]:checked,
 [type="checkbox"]:not(:checked){
-  position: absolute;
+  position: fixed;
   left: -9999px;
 }
 .menu-icon:checked + label,

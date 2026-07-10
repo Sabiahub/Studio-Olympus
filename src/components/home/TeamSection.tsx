@@ -11,21 +11,19 @@ export default function TeamSection({ team }: { team: any[] }) {
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
           {team.map((artist) => (
-            <div key={artist.id} className="text-center group bg-olympus-green-light border border-olympus-gold/10 p-4 md:p-6 hover:border-olympus-gold/40 transition-colors">
-              <div className="w-20 h-20 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden mb-4 md:mb-6 border-2 border-olympus-gold/20 group-hover:border-olympus-gold transition-colors">
-                <img src={artist.photo_url || "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=400"} alt={artist.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+            <div key={artist.id} className="relative group rounded-3xl overflow-hidden bg-olympus-green-light border border-olympus-gold/10 hover:border-olympus-gold/40 transition-all duration-500 shadow-lg hover:shadow-2xl">
+              <div className="aspect-[3/4] w-full bg-black/20">
+                <img src={artist.photo_url || "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=400"} alt={artist.name} className="w-full h-full object-cover object-top grayscale-0 md:grayscale md:group-hover:grayscale-0 md:group-hover:scale-105 transition-all duration-700" />
               </div>
-              <h3 className="font-serif text-base md:text-xl text-olympus-gold mb-1">{artist.name}</h3>
-              {artist.specialties && artist.specialties.length > 0 && (
-                <p className="text-[9px] md:text-sm font-sans text-olympus-white/60 mb-2 uppercase tracking-wide truncate">
-                  {artist.specialties.join(', ')}
-                </p>
-              )}
-              {artist.instagram && (
-                <a href={`https://instagram.com/${artist.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-[10px] md:text-xs text-olympus-gold/70 hover:text-olympus-gold underline underline-offset-4">
-                  {artist.instagram.startsWith('@') ? artist.instagram : `@${artist.instagram}`}
-                </a>
-              )}
+              
+              <div className="absolute bottom-4 left-4 right-4 bg-olympus-green-light/95 backdrop-blur-md border border-olympus-gold/20 py-3 px-4 rounded-2xl text-center transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 shadow-xl">
+                <h3 className="font-serif text-lg md:text-xl text-olympus-gold mb-0.5">{artist.name}</h3>
+                {artist.instagram && (
+                  <a href="https://www.instagram.com/studioolympus_/" target="_blank" rel="noopener noreferrer" className="text-xs md:text-sm text-white/80 hover:text-olympus-gold transition-colors inline-flex items-center justify-center">
+                    {artist.instagram.startsWith('@') ? artist.instagram : `@${artist.instagram}`}
+                  </a>
+                )}
+              </div>
             </div>
           ))}
         </div>

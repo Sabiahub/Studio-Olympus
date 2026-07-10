@@ -49,7 +49,7 @@ export default function PublicLayoutClient({ children }: { children: React.React
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
         {/* WhatsApp Floating Button */}
         <a
-          href="https://wa.me/5531999999999?text=Ol%C3%A1%21+Gostaria+de+agendar+uma+avalia%C3%A7%C3%A3o+no+Studio+Olympus."
+          href="https://api.whatsapp.com/send/?phone=5531982873734&text=Oi+%21+Quero+um+or%C3%A7amento%21&type=phone_number&app_absent=0"
           target="_blank"
           rel="noopener noreferrer"
           className="w-12 h-12 bg-olympus-gold text-olympus-green rounded-full flex items-center justify-center shadow-[0_4px_14px_rgba(203,163,109,0.4)] hover:scale-110 hover:bg-olympus-white hover:shadow-[0_4px_20px_rgba(240,240,237,0.5)] transition-all duration-300"
@@ -96,8 +96,8 @@ export default function PublicLayoutClient({ children }: { children: React.React
           </a>
 
           <div className="flex justify-center gap-6 mt-4">
-            <a href="#" className="hover:text-olympus-gold transition-colors">Instagram</a>
-            <a href="#" className="hover:text-olympus-gold transition-colors">WhatsApp</a>
+            <a href="https://www.instagram.com/studioolympus_/" target="_blank" rel="noopener noreferrer" className="hover:text-olympus-gold transition-colors">Instagram</a>
+            <a href="https://api.whatsapp.com/send/?phone=5531982873734&text=Oi+%21+Quero+um+or%C3%A7amento%21&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer" className="hover:text-olympus-gold transition-colors">WhatsApp</a>
           </div>
           <p className="mt-12 text-xs text-olympus-white/40 font-mono">
             © {new Date().getFullYear()} Studio Olympus. Todos os direitos reservados.
