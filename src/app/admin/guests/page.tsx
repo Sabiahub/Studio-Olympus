@@ -211,11 +211,30 @@ export default function GuestsPage() {
                     {formattedStart} {formattedStart && formattedEnd && ' - '} {formattedEnd}
                   </td>
                   <td className="p-4">
-                    {guest.active ? (
-                      <span className="text-xs text-green-400 font-mono uppercase tracking-widest border border-green-500/30 px-2 py-1 rounded-sm">Ativo</span>
-                    ) : (
-                      <span className="text-xs text-olympus-white/50 font-mono uppercase tracking-widest border border-olympus-white/20 px-2 py-1 rounded-sm">Inativo</span>
-                    )}
+                    {(() => {
+                      let statusText = 'Inativo';
+                      let statusColorClass = 'text-olympus-white/50 border-olympus-white/20';
+                      
+                      if (guest.active) {
+                        const todayStr = new Date().toISOString().split('T')[0];
+                        if (guest.guest_start && guest.guest_start > todayStr) {
+                          statusText = 'Agendado';
+                          statusColorClass = 'text-amber-400 border-amber-500/30';
+                        } else if (guest.guest_end && guest.guest_end < todayStr) {
+                          statusText = 'Encerrado';
+                          statusColorClass = 'text-gray-400 border-gray-500/30';
+                        } else {
+                          statusText = 'Ativo';
+                          statusColorClass = 'text-green-400 border-green-500/30';
+                        }
+                      }
+                      
+                      return (
+                        <span className={`text-xs font-mono uppercase tracking-widest border px-2 py-1 rounded-sm ${statusColorClass}`}>
+                          {statusText}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="p-4 text-right relative">
                     <button 

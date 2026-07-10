@@ -140,7 +140,7 @@ export default function FeaturedPage() {
       }
 
       const payload = {
-        ...formData,
+        title: formData.title,
         display_order: parseInt(formData.display_order, 10) || 0,
         artist_id: formData.artist_id || null,
         image_url: finalImageUrl

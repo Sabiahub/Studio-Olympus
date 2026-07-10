@@ -18,7 +18,7 @@ export default async function HomePage() {
     { data: studioData },
     { data: guestData }
   ] = await Promise.all([
-    supabase.from('artists').select('*').eq('active', true).order('display_order'),
+    supabase.from('artists').select('*').eq('active', true).eq('is_guest', false).order('display_order'),
     supabase.from('tattoos').select('*, artists(name)').order('created_at', { ascending: false }),
     supabase.from('featured_works').select('*, artists(name)').order('display_order'),
     supabase.from('studio').select('*').single(),
@@ -39,10 +39,9 @@ export default async function HomePage() {
   }
 
   const artists = artistsData || [];
-  // Filter out tattooed status here or in component, instruction says "Em TattoosSection, filtre para não exibir tatuagens com status = 'tattooed'". I'll do it before passing to TattoosSection or inside TattoosSection. Let's do it here. Wait, instruction says "Em TattoosSection, filtre...", I'll filter it in TattoosSection.
   const tattoos = tattoosData || [];
   const featuredWorks = featuredWorksData || [];
-  const studio = studioData || { whatsapp: '5531999999999' };
+  const studio = studioData || { whatsapp: '5531982873734' };
   const activeGuest = guestData && guestData.length > 0 ? guestData[0] : null;
 
   return (
@@ -51,8 +50,8 @@ export default async function HomePage() {
       <AboutSection studio={studio} />
       <FeaturedWorksSection works={featuredWorks} />
       <TattoosSection tattoos={tattoos} whatsapp={studio.whatsapp} />
-      <TeamSection team={artists} />
       {activeGuest && <GuestSection guest={activeGuest} whatsapp={studio.whatsapp} />}
+      <TeamSection team={artists} />
     </div>
   );
 }
