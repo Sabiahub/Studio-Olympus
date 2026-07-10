@@ -18,25 +18,22 @@ export default function GuestSection({ guest, whatsapp }: { guest: any, whatsapp
       <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/black-marble.png")' }}></div>
       
       <div className="container mx-auto px-4 relative z-10 flex flex-col items-center">
-        <h2 className="font-serif text-5xl md:text-7xl text-olympus-gold mb-8 uppercase tracking-widest drop-shadow-md">Guest</h2>
+        <h2 className="font-serif text-5xl md:text-7xl text-olympus-gold mb-2 uppercase tracking-widest drop-shadow-md">Guest</h2>
         
-        <div className="w-48 md:w-64 mb-8 relative">
-           <div className="absolute -inset-4 border border-olympus-gold/30 rounded-t-[100px] pointer-events-none flex flex-col items-center justify-start pt-4">
-             <div className="flex gap-2 mb-4 text-olympus-gold/60">
-               <span className="text-lg">✦</span>
-               <span className="text-xl -mt-2">✦</span>
-               <span className="text-lg">✦</span>
-             </div>
-           </div>
+        <div className="w-64 md:w-80 lg:w-96 mb-2 relative mx-auto">
            {guest.photo_url && (
-             <img src={guest.photo_url} alt={guest.name} className="w-full h-auto object-cover grayscale contrast-150 brightness-110 sepia-[0.3]" style={{filter: 'grayscale(1) sepia(0.5) hue-rotate(5deg) contrast(1.2)'}} />
+             <div className="w-full aspect-[3/4] rounded-t-[120px] md:rounded-t-[180px] border border-olympus-gold/30 overflow-hidden relative shadow-2xl shadow-black">
+               <img 
+                 src={guest.photo_url} 
+                 alt={guest.name} 
+                 className="w-full h-full object-cover" 
+                 style={{filter: 'grayscale(1) sepia(0.5) hue-rotate(5deg) contrast(1.2)'}} 
+               />
+             </div>
            )}
         </div>
         
-        <h3 className="font-serif text-4xl md:text-6xl text-olympus-gold tracking-widest uppercase mb-1">Olympus</h3>
-        <p className="font-sans text-xs md:text-sm text-olympus-gold tracking-[0.3em] uppercase mb-12">Studio</p>
-        
-        <div className="mt-4 p-8 border border-olympus-gold/20 max-w-lg bg-olympus-green/90 backdrop-blur-sm shadow-xl shadow-olympus-black/50">
+        <div className="mt-2 p-8 border border-olympus-gold/20 max-w-lg bg-olympus-green/90 backdrop-blur-sm shadow-xl shadow-olympus-black/50">
           <h4 className="font-serif text-2xl md:text-3xl text-olympus-white mb-2">{guest.name}</h4>
           <p className="font-mono text-[10px] md:text-xs text-olympus-gold mb-6 uppercase tracking-widest">Temporada: {seasonText}</p>
           <p className="font-sans text-sm md:text-base text-olympus-white/80 leading-relaxed mb-8 font-light">
