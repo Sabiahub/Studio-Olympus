@@ -23,7 +23,7 @@ export default function HeroSection({ studio }: { studio: any }) {
           </h1>
           <div className="w-24 h-[1px] bg-olympus-gold mx-auto mb-8"></div>
           <p className="font-sans text-xl md:text-2xl text-olympus-white/80 font-light mb-12">
-            {studio?.description || 'Estúdio de Tatuagem Clássica e Contemporânea'}
+            {studio?.description || 'O Melhor Estúdio de Tatuagem de Belo Horizonte'}
           </p>
           <Button 
             size="lg" 

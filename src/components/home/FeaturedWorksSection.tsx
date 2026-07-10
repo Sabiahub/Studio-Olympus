@@ -26,18 +26,18 @@ export default function FeaturedWorksSection({ works }: { works: any[] }) {
           padding-bottom: 24px; 
           display: flex;
           flex-direction: column;
-          gap: 100vh; /* Creates the scroll distance between cards */
+          gap: 30vh; /* Creates the scroll distance between cards (reduced for faster scroll) */
         }
         .scroll-section {
           position: sticky;
-          top: 100px; /* Offset from the top of the viewport when it sticks */
+          top: 16vh; /* Offset from the top of the viewport when it sticks */
           display: flex;
           justify-content: flex-start;
           align-items: flex-end;
           width: 100%;
           max-width: calc(100vw - 48px);
           margin: 0 auto;
-          height: 80vh;
+          height: 65vh; /* Reduced height from 80vh to 65vh */
           border-radius: 24px;
           overflow: hidden;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
