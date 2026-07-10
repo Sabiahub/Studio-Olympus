@@ -186,7 +186,7 @@ export default function GuestsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-olympus-gold/5">
-              {guests.map((guest) => {
+              {guests.map((guest, index) => {
                 const formattedStart = guest.guest_start ? format(parseISO(guest.guest_start), "dd/MM/yyyy") : '';
                 const formattedEnd = guest.guest_end ? format(parseISO(guest.guest_end), "dd/MM/yyyy") : '';
                 
@@ -225,7 +225,7 @@ export default function GuestsPage() {
                       <MoreHorizontal size={18} />
                     </button>
                     {openDropdownId === guest.id && (
-                      <div className="absolute right-4 mt-2 w-32 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-10 flex flex-col overflow-hidden">
+                      <div className={`absolute right-4 w-32 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= guests.length - 2 && guests.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
                         <button onClick={() => openEditModal(guest)} className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-white">Editar</button>
                         <button onClick={() => handleDelete(guest.id)} className="text-left px-4 py-2 text-sm hover:bg-olympus-wine/20 text-olympus-wine">Excluir</button>
                       </div>

@@ -188,7 +188,7 @@ export default function FeaturedPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-olympus-gold/5">
-              {works.map((work) => (
+              {works.map((work, index) => (
                 <tr key={work.id} className="hover:bg-olympus-white/5 transition-colors group">
                   <td className="p-4 font-mono text-olympus-gold">{work.display_order}</td>
                   <td className="p-4">
@@ -212,7 +212,7 @@ export default function FeaturedPage() {
                       <MoreHorizontal size={18} />
                     </button>
                     {openDropdownId === work.id && (
-                      <div className="absolute right-4 mt-2 w-32 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-10 flex flex-col overflow-hidden">
+                      <div className={`absolute right-4 w-32 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= works.length - 2 && works.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
                         <button onClick={() => openEditModal(work)} className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-white">Editar</button>
                         <button onClick={() => handleDelete(work.id)} className="text-left px-4 py-2 text-sm hover:bg-olympus-wine/20 text-olympus-wine">Excluir</button>
                       </div>
