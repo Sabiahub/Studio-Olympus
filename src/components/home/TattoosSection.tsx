@@ -83,7 +83,7 @@ export default function TattoosSection({ tattoos, whatsapp }: { tattoos: any[], 
             <motion.div 
               key={tattoo.id}
               whileHover={{ y: -5 }}
-              className={`group bg-olympus-black border border-olympus-gold/10 hover:border-olympus-gold/40 transition-all duration-300 relative overflow-hidden flex flex-col ${tattoo.status === 'reserved' ? 'opacity-70 grayscale-[30%]' : ''}`}
+              className={`group bg-olympus-black border border-olympus-gold/10 hover:border-olympus-gold/40 transition-all duration-300 relative overflow-hidden flex flex-col ${tattoo.status === 'reserved' ? 'grayscale opacity-80' : ''}`}
             >
               <div className="aspect-[3/4] overflow-hidden relative">
                 <img src={tattoo.image_url} alt={tattoo.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-60 group-hover:opacity-100" />
@@ -92,7 +92,7 @@ export default function TattoosSection({ tattoos, whatsapp }: { tattoos: any[], 
                 </div>
                 <div className="absolute top-2 right-2 md:top-4 md:right-4 flex flex-col gap-1 md:gap-2 items-end">
                   {tattoo.status === 'reserved' && (
-                    <div className="bg-olympus-gold/90 px-2 py-0.5 md:px-3 md:py-1 font-sans text-[10px] md:text-xs uppercase tracking-wider text-olympus-black font-semibold shadow-sm">
+                    <div className="bg-olympus-gold/90 px-2 py-0.5 md:px-3 md:py-1 font-sans text-[10px] md:text-xs uppercase tracking-wider text-olympus-black font-bold shadow-sm">
                       Reservada
                     </div>
                   )}
@@ -124,10 +124,11 @@ export default function TattoosSection({ tattoos, whatsapp }: { tattoos: any[], 
                   </div>
                 </div>
                 <Button 
-                  className="w-full font-serif uppercase tracking-wider text-[10px] md:text-sm py-1 md:py-2 h-auto md:h-10"
-                  onClick={() => handleWhatsAppClick(tattoo.id, tattoo.code)}
+                  className={`w-full font-serif uppercase tracking-wider text-[10px] md:text-sm py-1 md:py-2 h-auto md:h-10 ${tattoo.status === 'reserved' ? 'bg-olympus-white/10 text-olympus-white/40 cursor-not-allowed hover:bg-olympus-white/10' : ''}`}
+                  onClick={() => tattoo.status !== 'reserved' && handleWhatsAppClick(tattoo.id, tattoo.code)}
+                  disabled={tattoo.status === 'reserved'}
                 >
-                  Tenho Interesse
+                  {tattoo.status === 'reserved' ? 'Já Reservada' : 'Tenho Interesse'}
                 </Button>
               </div>
             </motion.div>

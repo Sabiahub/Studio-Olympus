@@ -270,8 +270,32 @@ export default function TattoosPage() {
                       <MoreHorizontal size={18} />
                     </button>
                     {openDropdownId === tattoo.id && (
-                      <div className={`absolute right-4 w-32 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= filteredTattoos.length - 2 && filteredTattoos.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
-                        <button onClick={() => openEditModal(tattoo)} className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-white">Editar</button>
+                      <div className={`absolute right-4 w-36 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= filteredTattoos.length - 2 && filteredTattoos.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
+                        {tattoo.status !== 'reserved' && (
+                          <button 
+                            onClick={() => {
+                              setOpenDropdownId(null);
+                              setTattoos(tattoos.map(t => t.id === tattoo.id ? { ...t, status: 'reserved' } : t));
+                              supabase.from('tattoos').update({ status: 'reserved' }).eq('id', tattoo.id);
+                            }} 
+                            className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-gold"
+                          >
+                            Reservar
+                          </button>
+                        )}
+                        {tattoo.status !== 'available' && (
+                          <button 
+                            onClick={() => {
+                              setOpenDropdownId(null);
+                              setTattoos(tattoos.map(t => t.id === tattoo.id ? { ...t, status: 'available' } : t));
+                              supabase.from('tattoos').update({ status: 'available' }).eq('id', tattoo.id);
+                            }} 
+                            className="text-left px-4 py-2 text-sm hover:bg-green-500/10 text-green-400"
+                          >
+                            Disponibilizar
+                          </button>
+                        )}
+                        <button onClick={() => openEditModal(tattoo)} className="text-left px-4 py-2 text-sm hover:bg-olympus-white/5 text-olympus-white border-t border-olympus-white/5">Editar</button>
                         <button onClick={() => handleDelete(tattoo.id)} className="text-left px-4 py-2 text-sm hover:bg-olympus-wine/20 text-olympus-wine">Excluir</button>
                       </div>
                     )}
