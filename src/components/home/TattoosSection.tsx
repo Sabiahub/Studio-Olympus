@@ -19,6 +19,7 @@ export default function TattoosSection({ tattoos, whatsapp }: { tattoos: any[], 
   }, [tattoos]);
 
   const filteredTattoos = tattoos.filter(t => {
+    if (t.status === 'tattooed') return false;
     const matchStyle = selectedStyle === 'Todos' || t.category === selectedStyle;
     const matchArtist = selectedArtist === 'Todos os tatuadores' || t.artist?.name === selectedArtist;
     return matchStyle && matchArtist;
@@ -82,18 +83,25 @@ export default function TattoosSection({ tattoos, whatsapp }: { tattoos: any[], 
             <motion.div 
               key={tattoo.id}
               whileHover={{ y: -5 }}
-              className="group bg-olympus-black border border-olympus-gold/10 hover:border-olympus-gold/40 transition-all duration-300 relative overflow-hidden flex flex-col"
+              className={`group bg-olympus-black border border-olympus-gold/10 hover:border-olympus-gold/40 transition-all duration-300 relative overflow-hidden flex flex-col ${tattoo.status === 'reserved' ? 'opacity-70 grayscale-[30%]' : ''}`}
             >
               <div className="aspect-[3/4] overflow-hidden relative">
                 <img src={tattoo.image_url} alt={tattoo.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-60 group-hover:opacity-100" />
                 <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-olympus-black/80 backdrop-blur-sm px-2 py-0.5 md:px-3 md:py-1 font-mono text-[10px] md:text-xs border border-olympus-gold/30 text-olympus-gold">
                   {tattoo.code}
                 </div>
-                {tattoo.is_promotion && (
-                  <div className="absolute top-2 right-2 md:top-4 md:right-4 bg-olympus-wine px-2 py-0.5 md:px-3 md:py-1 font-sans text-[10px] md:text-xs uppercase tracking-wider text-white">
-                    Promo
-                  </div>
-                )}
+                <div className="absolute top-2 right-2 md:top-4 md:right-4 flex flex-col gap-1 md:gap-2 items-end">
+                  {tattoo.status === 'reserved' && (
+                    <div className="bg-olympus-gold/90 px-2 py-0.5 md:px-3 md:py-1 font-sans text-[10px] md:text-xs uppercase tracking-wider text-olympus-black font-semibold shadow-sm">
+                      Reservada
+                    </div>
+                  )}
+                  {tattoo.is_promotion && (
+                    <div className="bg-olympus-wine px-2 py-0.5 md:px-3 md:py-1 font-sans text-[10px] md:text-xs uppercase tracking-wider text-white shadow-sm">
+                      Promo
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="p-3 md:p-6 flex-1 flex flex-col justify-between">
                 <div>
