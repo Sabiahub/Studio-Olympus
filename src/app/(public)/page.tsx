@@ -29,6 +29,7 @@ export default async function HomePage() {
       .eq('active', true)
       .lte('guest_start', today)
       .or(`guest_end.is.null,guest_end.gte.${today}`)
+      .order('created_at', { ascending: true })
   ]);
 
   if (!tattoosData || tattoosData.length === 0) {
@@ -42,7 +43,7 @@ export default async function HomePage() {
   const tattoos = tattoosData || [];
   const featuredWorks = featuredWorksData || [];
   const studio = studioData || { whatsapp: '5531982873734' };
-  const activeGuest = guestData && guestData.length > 0 ? guestData[0] : null;
+  const activeGuests = guestData && guestData.length > 0 ? guestData : [];
 
   return (
     <div>
@@ -50,7 +51,7 @@ export default async function HomePage() {
       <AboutSection studio={studio} />
       <FeaturedWorksSection works={featuredWorks} />
       <TattoosSection tattoos={tattoos} whatsapp={studio.whatsapp} />
-      {activeGuest && <GuestSection guest={activeGuest} whatsapp={studio.whatsapp} />}
+      {activeGuests.length > 0 && <GuestSection guests={activeGuests} whatsapp={studio.whatsapp} />}
       <TeamSection team={artists} />
     </div>
   );

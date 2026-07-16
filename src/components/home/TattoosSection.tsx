@@ -14,14 +14,14 @@ export default function TattoosSection({ tattoos, whatsapp }: { tattoos: any[], 
   }, [tattoos]);
 
   const artists = useMemo(() => {
-    const a = new Set(tattoos.map(t => t.artist?.name).filter(Boolean));
+    const a = new Set(tattoos.map(t => t.artists?.name).filter(Boolean));
     return ['Todos os tatuadores', ...Array.from(a)];
   }, [tattoos]);
 
   const filteredTattoos = tattoos.filter(t => {
     if (t.status === 'tattooed') return false;
     const matchStyle = selectedStyle === 'Todos' || t.category === selectedStyle;
-    const matchArtist = selectedArtist === 'Todos os tatuadores' || t.artist?.name === selectedArtist;
+    const matchArtist = selectedArtist === 'Todos os tatuadores' || t.artists?.name === selectedArtist;
     return matchStyle && matchArtist;
   });
 
@@ -105,7 +105,7 @@ export default function TattoosSection({ tattoos, whatsapp }: { tattoos: any[], 
               </div>
               <div className="p-3 md:p-6 flex-1 flex flex-col justify-between">
                 <div>
-                  <p className="text-[10px] md:text-sm text-olympus-white/50 mb-1 md:mb-2 font-mono uppercase truncate">{tattoo.artist?.name || 'Desconhecido'}</p>
+                  <p className="text-[10px] md:text-sm text-olympus-white/50 mb-1 md:mb-2 font-mono uppercase truncate">{tattoo.artists?.name || 'Desconhecido'}</p>
                   <h3 className="font-serif text-sm md:text-xl mb-2 md:mb-4 truncate">{tattoo.title}</h3>
                   <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 md:mb-6 gap-2">
                     <div className="flex items-center">

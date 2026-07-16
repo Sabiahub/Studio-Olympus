@@ -55,6 +55,7 @@ export default function TattoosPage() {
     const { data } = await supabase
       .from('artists')
       .select('id, name')
+      .eq('is_guest', false)
       .order('name');
     if (data) setArtists(data);
   };
