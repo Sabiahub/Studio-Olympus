@@ -105,9 +105,11 @@ export default function SettingsPage() {
 
       const { data } = await supabase.from('studio').select('id');
       if (data && data.length > 0) {
-        await supabase.from('studio').update(payload).eq('id', data[0].id);
+        const { error, data: updatedData } = await supabase.from('studio').update(payload).eq('id', data[0].id).select();
+        if (error || !updatedData || updatedData.length === 0) throw new Error(error?.message || 'Permissão negada.');
       } else {
-        await supabase.from('studio').insert([{ ...payload, id: '00000000-0000-0000-0000-000000000000' }]);
+        const { error } = await supabase.from('studio').insert([{ ...payload, id: '00000000-0000-0000-0000-000000000000' }]);
+        if (error) throw error;
       }
 
       alert('Configurações salvas com sucesso!');

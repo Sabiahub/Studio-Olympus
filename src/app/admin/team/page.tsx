@@ -89,7 +89,11 @@ export default function TeamPage() {
       }
     }
 
-    await supabase.from('artists').delete().eq('id', id);
+    const { data, error } = await supabase.from('artists').delete().eq('id', id).select();
+    if (error || !data || data.length === 0) {
+      alert(`Não foi possível excluir: ${error?.message || 'Permissão negada ou artista não encontrado.'}`);
+      return;
+    }
     fetchArtists();
   };
 
@@ -148,9 +152,13 @@ export default function TeamPage() {
       };
 
       if (editingId) {
-        await supabase.from('artists').update(payload).eq('id', editingId);
+        const { data, error } = await supabase.from('artists').update(payload).eq('id', editingId).select();
+        if (error || !data || data.length === 0) {
+          throw new Error(error?.message || 'Permissão negada ou artista não encontrado.');
+        }
       } else {
-        await supabase.from('artists').insert(payload);
+        const { error } = await supabase.from('artists').insert(payload);
+        if (error) throw error;
       }
 
       setIsModalOpen(false);

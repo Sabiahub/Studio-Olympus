@@ -96,7 +96,11 @@ export default function FeaturedPage() {
       }
     }
 
-    await supabase.from('featured_works').delete().eq('id', id);
+    const { data, error } = await supabase.from('featured_works').delete().eq('id', id).select();
+    if (error || !data || data.length === 0) {
+      alert(`Não foi possível excluir: ${error?.message || 'Permissão negada ou registro não encontrado.'}`);
+      return;
+    }
     fetchWorks();
   };
 
@@ -147,9 +151,13 @@ export default function FeaturedPage() {
       };
 
       if (editingId) {
-        await supabase.from('featured_works').update(payload).eq('id', editingId);
+        const { data, error } = await supabase.from('featured_works').update(payload).eq('id', editingId).select();
+        if (error || !data || data.length === 0) {
+          throw new Error(error?.message || 'Permissão negada ou registro não encontrado.');
+        }
       } else {
-        await supabase.from('featured_works').insert(payload);
+        const { error } = await supabase.from('featured_works').insert(payload);
+        if (error) throw error;
       }
 
       setIsModalOpen(false);

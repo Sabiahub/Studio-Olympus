@@ -66,7 +66,11 @@ export default function TattoosPage() {
       currentStatus === 'reserved' ? 'tattooed' : 'available';
       
     setTattoos(tattoos.map(t => t.id === id ? { ...t, status: nextStatus } : t));
-    await supabase.from('tattoos').update({ status: nextStatus }).eq('id', id);
+    const { data, error } = await supabase.from('tattoos').update({ status: nextStatus }).eq('id', id).select();
+    if (error || !data || data.length === 0) {
+      alert(`Não foi possível alterar o status: ${error?.message || 'Permissão negada ou arte não encontrada.'}`);
+      setTattoos([...tattoos]); // Revert visual state
+    }
   };
 
   const openNewModal = () => {
@@ -118,7 +122,11 @@ export default function TattoosPage() {
       }
     }
 
-    await supabase.from('tattoos').delete().eq('id', id);
+    const { data, error } = await supabase.from('tattoos').delete().eq('id', id).select();
+    if (error || !data || data.length === 0) {
+      alert(`Não foi possível excluir: ${error?.message || 'Permissão negada ou arte não encontrada.'}`);
+      return;
+    }
     fetchTattoos();
   };
 
@@ -170,9 +178,13 @@ export default function TattoosPage() {
       };
 
       if (editingId) {
-        await supabase.from('tattoos').update(payload).eq('id', editingId);
+        const { data, error } = await supabase.from('tattoos').update(payload).eq('id', editingId).select();
+        if (error || !data || data.length === 0) {
+          throw new Error(error?.message || 'Permissão negada ou arte não encontrada.');
+        }
       } else {
-        await supabase.from('tattoos').insert(payload);
+        const { error } = await supabase.from('tattoos').insert(payload);
+        if (error) throw error;
       }
 
       setIsModalOpen(false);
@@ -279,10 +291,14 @@ export default function TattoosPage() {
                         <div className={`absolute right-4 w-36 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= filteredTattoos.length - 2 && filteredTattoos.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
                         {tattoo.status !== 'reserved' && (
                           <button 
-                            onClick={() => {
+                            onClick={async () => {
                               setOpenDropdownId(null);
                               setTattoos(tattoos.map(t => t.id === tattoo.id ? { ...t, status: 'reserved' } : t));
-                              supabase.from('tattoos').update({ status: 'reserved' }).eq('id', tattoo.id);
+                              const { data, error } = await supabase.from('tattoos').update({ status: 'reserved' }).eq('id', tattoo.id).select();
+                              if (error || !data || data.length === 0) {
+                                alert(`Não foi possível alterar: ${error?.message || 'Permissão negada'}`);
+                                setTattoos([...tattoos]); // revert
+                              }
                             }} 
                             className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-gold"
                           >
@@ -291,10 +307,14 @@ export default function TattoosPage() {
                         )}
                         {tattoo.status !== 'available' && (
                           <button 
-                            onClick={() => {
+                            onClick={async () => {
                               setOpenDropdownId(null);
                               setTattoos(tattoos.map(t => t.id === tattoo.id ? { ...t, status: 'available' } : t));
-                              supabase.from('tattoos').update({ status: 'available' }).eq('id', tattoo.id);
+                              const { data, error } = await supabase.from('tattoos').update({ status: 'available' }).eq('id', tattoo.id).select();
+                              if (error || !data || data.length === 0) {
+                                alert(`Não foi possível alterar: ${error?.message || 'Permissão negada'}`);
+                                setTattoos([...tattoos]); // revert
+                              }
                             }} 
                             className="text-left px-4 py-2 text-sm hover:bg-green-500/10 text-green-400"
                           >

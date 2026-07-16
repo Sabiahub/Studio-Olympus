@@ -85,29 +85,29 @@ $$ LANGUAGE sql SECURITY DEFINER;
 
 -- Artists policies
 CREATE POLICY "Editors can insert artists" ON artists FOR INSERT WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
-CREATE POLICY "Editors can update artists" ON artists FOR UPDATE USING (public.get_user_role() IN ('admin', 'editor'));
+CREATE POLICY "Editors can update artists" ON artists FOR UPDATE USING (true) WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
 CREATE POLICY "Editors can delete artists" ON artists FOR DELETE USING (public.get_user_role() IN ('admin', 'editor'));
 
 -- Tattoos policies
 CREATE POLICY "Editors can insert tattoos" ON tattoos FOR INSERT WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
-CREATE POLICY "Editors can update tattoos" ON tattoos FOR UPDATE USING (public.get_user_role() IN ('admin', 'editor'));
+CREATE POLICY "Editors can update tattoos" ON tattoos FOR UPDATE USING (true) WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
 CREATE POLICY "Editors can delete tattoos" ON tattoos FOR DELETE USING (public.get_user_role() IN ('admin', 'editor'));
 -- Allow public to increment click_count (update only click_count if needed, or via RPC function)
 -- It's safer to use an RPC function for incrementing click_count to avoid public updates.
 
 -- Featured works policies
 CREATE POLICY "Editors can insert featured_works" ON featured_works FOR INSERT WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
-CREATE POLICY "Editors can update featured_works" ON featured_works FOR UPDATE USING (public.get_user_role() IN ('admin', 'editor'));
+CREATE POLICY "Editors can update featured_works" ON featured_works FOR UPDATE USING (true) WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
 CREATE POLICY "Editors can delete featured_works" ON featured_works FOR DELETE USING (public.get_user_role() IN ('admin', 'editor'));
 
 -- Studio policies
-CREATE POLICY "Editors can update studio" ON studio FOR UPDATE USING (public.get_user_role() IN ('admin', 'editor'));
+CREATE POLICY "Editors can update studio" ON studio FOR UPDATE USING (true) WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
 -- Initialize studio row
 INSERT INTO studio (id, title) VALUES (gen_random_uuid(), 'Studio Olympus');
 
 -- Profiles policies
 CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT USING (public.get_user_role() = 'admin' OR id = auth.uid());
-CREATE POLICY "Admins can update profiles" ON profiles FOR UPDATE USING (public.get_user_role() = 'admin');
+CREATE POLICY "Admins can update profiles" ON profiles FOR UPDATE USING (true) WITH CHECK (public.get_user_role() = 'admin');
 CREATE POLICY "Admins can insert profiles" ON profiles FOR INSERT WITH CHECK (public.get_user_role() = 'admin');
 
 -- RPC for incrementing click_count securely
@@ -124,5 +124,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 INSERT INTO storage.buckets (id, name, public) VALUES ('olympus', 'olympus', true);
 CREATE POLICY "Public read images" ON storage.objects FOR SELECT USING (bucket_id = 'olympus');
 CREATE POLICY "Editors can upload images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'olympus' AND public.get_user_role() IN ('admin', 'editor'));
-CREATE POLICY "Editors can update images" ON storage.objects FOR UPDATE USING (bucket_id = 'olympus' AND public.get_user_role() IN ('admin', 'editor'));
+CREATE POLICY "Editors can update images" ON storage.objects FOR UPDATE USING (bucket_id = 'olympus') WITH CHECK (bucket_id = 'olympus' AND public.get_user_role() IN ('admin', 'editor'));
 CREATE POLICY "Editors can delete images" ON storage.objects FOR DELETE USING (bucket_id = 'olympus' AND public.get_user_role() IN ('admin', 'editor'));
