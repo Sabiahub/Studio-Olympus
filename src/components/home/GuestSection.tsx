@@ -54,23 +54,23 @@ export default function GuestSection({ guests, whatsapp }: { guests: any[], what
               >
                 <div className="w-64 md:w-80 lg:w-96 mb-2 relative mx-auto">
                    {guest.photo_url && (
-                     <motion.div 
-                       layoutId={`guest-image-container-${guest.id}`}
-                       className="w-full aspect-[3/4] rounded-t-[120px] md:rounded-t-[180px] border border-olympus-gold/30 overflow-hidden relative shadow-2xl shadow-black group-hover:border-olympus-gold/60 transition-colors duration-500"
-                     >
-                       <motion.img 
-                         layoutId={`guest-image-${guest.id}`}
-                         src={guest.photo_url} 
-                         alt={guest.name} 
-                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                         style={{filter: 'grayscale(1) sepia(0.5) hue-rotate(5deg) contrast(1.2)'}} 
-                       />
-                     </motion.div>
+                     <div className="w-full aspect-[3/4] rounded-3xl border border-olympus-gold/30 overflow-hidden relative shadow-2xl shadow-black group-hover:border-olympus-gold/60 transition-colors duration-500">
+                       <div className="w-full h-full group-hover:scale-105 transition-transform duration-700">
+                         <motion.img 
+                           layoutId={`guest-image-${guest.id}`}
+                           src={guest.photo_url} 
+                           alt={guest.name} 
+                           className="w-full h-full object-cover object-top transition-[filter] duration-700" 
+                           style={{filter: 'grayscale(1) sepia(0.5) hue-rotate(5deg) contrast(1.2)'}} 
+                         />
+                       </div>
+                     </div>
                    )}
                 </div>
                 
                 <motion.div 
-                  layoutId={`guest-overlay-${guest.id}`}
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   className="mt-2 p-8 border border-olympus-gold/20 w-full max-w-lg bg-olympus-green/90 backdrop-blur-sm shadow-xl shadow-olympus-black/50 flex-1 flex flex-col group-hover:border-olympus-gold/40 transition-colors duration-500"
                 >
                   <motion.h4 
@@ -125,20 +125,19 @@ export default function GuestSection({ guests, whatsapp }: { guests: any[], what
               </button>
 
               <div className="relative h-64 md:h-96 w-full shrink-0 flex flex-col">
-                <motion.div 
-                  layoutId={`guest-image-container-${selectedId}`}
-                  className="absolute inset-0 w-full h-full"
-                >
+                <div className="absolute inset-0 w-full h-full overflow-hidden">
                   <motion.img
                     layoutId={`guest-image-${selectedId}`}
                     src={selectedGuest.photo_url}
                     alt={selectedGuest.name}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-top transition-[filter] duration-700"
                     style={{filter: 'grayscale(0.3) sepia(0.2) hue-rotate(5deg) contrast(1.1)'}} 
                   />
-                </motion.div>
+                </div>
                 <motion.div
-                  layoutId={`guest-overlay-${selectedId}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
                   className="absolute inset-0 bg-gradient-to-t from-olympus-green via-olympus-green/60 to-transparent flex flex-col justify-end p-8"
                 >
                   <motion.h2
@@ -190,12 +189,12 @@ export default function GuestSection({ guests, whatsapp }: { guests: any[], what
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 * index, duration: 0.4 }}
-                        className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors"
+                        className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors md:aspect-[4/5]"
                       >
                         <img
                           src={img.image_url}
                           alt={`${selectedGuest.name} portfolio ${index + 1}`}
-                          className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
+                          className="w-full object-cover hover:scale-105 transition-transform duration-500 h-auto md:h-full"
                           loading="lazy"
                         />
                       </motion.div>

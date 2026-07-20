@@ -35,19 +35,22 @@ export default function TeamSection({ team }: { team: any[] }) {
               layoutId={`team-card-${artist.id}`}
               key={artist.id} 
               onClick={() => setSelectedId(artist.id)}
-              className="relative group rounded-3xl overflow-hidden bg-olympus-green-light border border-olympus-gold/10 hover:border-olympus-gold/40 transition-all duration-500 shadow-lg hover:shadow-2xl cursor-pointer"
+              className="relative group rounded-3xl overflow-hidden bg-olympus-green-light border border-olympus-gold/10 hover:border-olympus-gold/40 transition-colors transition-shadow duration-500 shadow-lg hover:shadow-2xl cursor-pointer"
             >
-              <div className="aspect-[3/4] w-full bg-black/20">
-                <motion.img 
-                  layoutId={`team-image-${artist.id}`}
-                  src={artist.photo_url || "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=400"} 
-                  alt={artist.name} 
-                  className="w-full h-full object-cover object-top grayscale-0 md:grayscale md:group-hover:grayscale-0 md:group-hover:scale-105 transition-all duration-700" 
-                />
+              <div className="aspect-[3/4] w-full bg-black/20 overflow-hidden">
+                <div className="w-full h-full md:group-hover:scale-105 transition-transform duration-700">
+                  <motion.img 
+                    layoutId={`team-image-${artist.id}`}
+                    src={artist.photo_url || "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=400"} 
+                    alt={artist.name} 
+                    className="w-full h-full object-cover object-top grayscale-0 md:grayscale md:group-hover:grayscale-0 transition-[filter] duration-700" 
+                  />
+                </div>
               </div>
               
               <motion.div 
-                layoutId={`team-overlay-${artist.id}`}
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="absolute bottom-4 left-4 right-4 bg-olympus-green-light/95 backdrop-blur-md border border-olympus-gold/20 py-3 px-4 rounded-2xl text-center transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 shadow-xl"
               >
                 <motion.h3 
@@ -103,7 +106,9 @@ export default function TeamSection({ team }: { team: any[] }) {
                   className="absolute inset-0 w-full h-full object-cover object-top"
                 />
                 <motion.div
-                  layoutId={`team-overlay-${selectedId}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
                   className="absolute inset-0 bg-gradient-to-t from-olympus-green via-olympus-green/40 to-transparent flex flex-col justify-end p-8"
                 >
                   <motion.h2
@@ -157,12 +162,12 @@ export default function TeamSection({ team }: { team: any[] }) {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 * index, duration: 0.4 }}
-                        className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors"
+                        className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors md:aspect-[4/5]"
                       >
                         <img
                           src={img.image_url}
                           alt={`${selectedArtist.name} portfolio ${index + 1}`}
-                          className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
+                          className="w-full object-cover hover:scale-105 transition-transform duration-500 h-auto md:h-full"
                           loading="lazy"
                         />
                       </motion.div>
