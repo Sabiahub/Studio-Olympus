@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { Plus, MoreHorizontal, Loader2, Image as ImageIcon, X, Upload } from 'lucide-react';
+import { Plus, MoreHorizontal, Loader2, Image as ImageIcon, X, Upload, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 
 export default function TeamPage() {
@@ -28,7 +28,11 @@ export default function TeamPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  const [portfolioImages, setPortfolioImages] = useState<any[]>([]);
+  const [isUploadingPortfolio, setIsUploadingPortfolio] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const portfolioInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchArtists();
@@ -38,7 +42,7 @@ export default function TeamPage() {
     setLoading(true);
     const { data } = await supabase
       .from('artists')
-      .select('*')
+      .select('*, portfolio_images(*)')
       .eq('is_guest', false)
       .order('display_order', { ascending: true });
     if (data) setArtists(data);
@@ -52,6 +56,7 @@ export default function TeamPage() {
     setEditingId(null);
     setImageFile(null);
     setPreviewUrl(null);
+    setPortfolioImages([]);
     setIsModalOpen(true);
     setOpenDropdownId(null);
   };
@@ -68,6 +73,7 @@ export default function TeamPage() {
     setEditingId(artist.id);
     setImageFile(null);
     setPreviewUrl(artist.photo_url);
+    setPortfolioImages(artist.portfolio_images ? [...artist.portfolio_images].sort((a, b) => (a.display_order || 0) - (b.display_order || 0)) : []);
     setIsModalOpen(true);
     setOpenDropdownId(null);
   };
@@ -103,6 +109,118 @@ export default function TeamPage() {
 
     setImageFile(file);
     setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleAddPortfolioImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!editingId) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    setIsUploadingPortfolio(true);
+    
+    try {
+      let maxOrder = 0;
+      if (portfolioImages.length > 0) {
+        maxOrder = Math.max(...portfolioImages.map(img => img.display_order || 0));
+      }
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        const compressedFile = await imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true
+        });
+
+        const fileExt = compressedFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `portfolio/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('olympus')
+          .upload(filePath, compressedFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('olympus')
+          .getPublicUrl(filePath);
+          
+        const nextOrder = maxOrder + 1 + i;
+
+        const { data, error } = await supabase.from('portfolio_images').insert({
+          artist_id: editingId,
+          image_url: publicUrl,
+          display_order: nextOrder
+        }).select();
+
+        if (error || !data || data.length === 0) {
+          throw new Error(error?.message || 'Erro ao inserir imagem no banco.');
+        }
+
+        setPortfolioImages(prev => [...prev, data[0]]);
+      }
+    } catch (error: any) {
+      console.error('Error uploading portfolio:', error);
+      alert(`Falha ao adicionar imagem: ${error.message}`);
+    } finally {
+      setIsUploadingPortfolio(false);
+      if (portfolioInputRef.current) portfolioInputRef.current.value = '';
+    }
+  };
+
+  const handleRemovePortfolioImage = async (imageId: string, imageUrl: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta imagem do portfólio?')) return;
+    
+    try {
+      const url = new URL(imageUrl);
+      const pathParts = url.pathname.split('/olympus/');
+      if (pathParts.length > 1) {
+        await supabase.storage.from('olympus').remove([pathParts[1]]);
+      }
+    } catch (e) {
+      console.error("Failed to parse/delete image URL", e);
+    }
+
+    const { data, error } = await supabase.from('portfolio_images').delete().eq('id', imageId).select();
+    if (error || !data || data.length === 0) {
+      alert(`Não foi possível excluir: ${error?.message || 'Permissão negada.'}`);
+      return;
+    }
+    
+    setPortfolioImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  const handleMovePortfolioImage = async (index: number, direction: 'up' | 'down') => {
+    if (
+      (direction === 'up' && index === 0) || 
+      (direction === 'down' && index === portfolioImages.length - 1)
+    ) {
+      return;
+    }
+
+    const newImages = [...portfolioImages];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    
+    const currentItem = newImages[index];
+    const targetItem = newImages[targetIndex];
+    
+    const tempOrder = currentItem.display_order;
+    currentItem.display_order = targetItem.display_order;
+    targetItem.display_order = tempOrder;
+
+    newImages[index] = targetItem;
+    newImages[targetIndex] = currentItem;
+    
+    setPortfolioImages(newImages);
+
+    const { error: err1 } = await supabase.from('portfolio_images').update({ display_order: currentItem.display_order }).eq('id', currentItem.id);
+    const { error: err2 } = await supabase.from('portfolio_images').update({ display_order: targetItem.display_order }).eq('id', targetItem.id);
+    
+    if (err1 || err2) {
+      alert("Aviso: Houve um erro de rede ao salvar a reordenação no banco de dados. A ordem pode ficar temporariamente incorreta.");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -229,10 +347,16 @@ export default function TeamPage() {
                       <MoreHorizontal size={18} />
                     </button>
                     {openDropdownId === artist.id && (
-                      <div className={`absolute right-4 w-32 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= artists.length - 2 && artists.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
-                        <button onClick={() => openEditModal(artist)} className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-white">Editar</button>
-                        <button onClick={() => handleDelete(artist.id)} className="text-left px-4 py-2 text-sm hover:bg-olympus-wine/20 text-olympus-wine">Excluir</button>
-                      </div>
+                      <>
+                        <div 
+                          className="fixed inset-0 z-40" 
+                          onClick={() => setOpenDropdownId(null)}
+                        ></div>
+                        <div className={`absolute right-4 w-32 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= artists.length - 2 && artists.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
+                          <button onClick={() => openEditModal(artist)} className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-white">Editar</button>
+                          <button onClick={() => handleDelete(artist.id)} className="text-left px-4 py-2 text-sm hover:bg-olympus-wine/20 text-olympus-wine">Excluir</button>
+                        </div>
+                      </>
                     )}
                   </td>
                 </tr>
@@ -314,6 +438,72 @@ export default function TeamPage() {
                   </div>
                 </div>
               </form>
+
+              {editingId && (
+                <div className="p-6 pt-0 mt-6 border-t border-olympus-gold/10 flex flex-col gap-4">
+                  <div className="flex justify-between items-center mt-6">
+                    <h3 className="font-serif text-xl text-olympus-gold">Imagens do Portfólio</h3>
+                    <div>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple 
+                        className="hidden" 
+                        ref={portfolioInputRef}
+                        onChange={handleAddPortfolioImage}
+                      />
+                      <Button 
+                        type="button"
+                        onClick={() => portfolioInputRef.current?.click()} 
+                        disabled={isUploadingPortfolio}
+                        className="gap-2 bg-olympus-black border border-olympus-gold/30 text-olympus-gold hover:bg-olympus-gold hover:text-olympus-black"
+                      >
+                        {isUploadingPortfolio ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                        Adicionar Imagens
+                      </Button>
+                    </div>
+                  </div>
+
+                  {portfolioImages.length === 0 ? (
+                    <div className="text-center p-8 border border-dashed border-olympus-gold/20 rounded-sm text-olympus-white/40">
+                      Nenhuma imagem no portfólio.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4 pb-4">
+                      {portfolioImages.map((img, index) => (
+                        <div key={img.id} className="relative group rounded-sm overflow-hidden border border-olympus-gold/20 aspect-[3/4]">
+                          <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <button 
+                              type="button"
+                              onClick={() => handleMovePortfolioImage(index, 'up')}
+                              disabled={index === 0}
+                              className="p-2 bg-olympus-graphite rounded-full hover:bg-olympus-gold hover:text-olympus-black text-olympus-white disabled:opacity-30 transition-colors shadow-lg"
+                            >
+                              <ArrowUp size={16} />
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={() => handleRemovePortfolioImage(img.id, img.image_url)}
+                              className="p-2 bg-olympus-wine/80 rounded-full hover:bg-olympus-wine text-olympus-white transition-colors shadow-lg"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={() => handleMovePortfolioImage(index, 'down')}
+                              disabled={index === portfolioImages.length - 1}
+                              className="p-2 bg-olympus-graphite rounded-full hover:bg-olympus-gold hover:text-olympus-black text-olympus-white disabled:opacity-30 transition-colors shadow-lg"
+                            >
+                              <ArrowDown size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="p-6 border-t border-olympus-gold/10 bg-olympus-graphite z-10 flex justify-end gap-4">

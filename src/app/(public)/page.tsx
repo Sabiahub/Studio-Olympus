@@ -18,13 +18,13 @@ export default async function HomePage() {
     { data: studioData },
     { data: guestData }
   ] = await Promise.all([
-    supabase.from('artists').select('*').eq('active', true).eq('is_guest', false).order('display_order'),
+    supabase.from('artists').select('*, portfolio_images(*)').eq('active', true).eq('is_guest', false).order('display_order'),
     supabase.from('tattoos').select('*, artists(name)').order('created_at', { ascending: false }),
     supabase.from('featured_works').select('*, artists(name)').order('display_order'),
     supabase.from('studio').select('*').single(),
     supabase
       .from('artists')
-      .select('*')
+      .select('*, portfolio_images(*)')
       .eq('is_guest', true)
       .eq('active', true)
       .lte('guest_start', today)

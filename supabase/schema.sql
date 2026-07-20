@@ -41,6 +41,15 @@ CREATE TABLE featured_works (
   created_at timestamptz DEFAULT now()
 );
 
+-- portfolio_images
+CREATE TABLE portfolio_images (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  artist_id uuid REFERENCES artists(id) ON DELETE CASCADE,
+  image_url text NOT NULL,
+  display_order int DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
 -- studio
 CREATE TABLE studio (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -66,6 +75,7 @@ CREATE TABLE profiles (
 ALTER TABLE artists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tattoos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE featured_works ENABLE ROW LEVEL SECURITY;
+ALTER TABLE portfolio_images ENABLE ROW LEVEL SECURITY;
 ALTER TABLE studio ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
@@ -73,6 +83,7 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read artists" ON artists FOR SELECT USING (true);
 CREATE POLICY "Public read tattoos" ON tattoos FOR SELECT USING (true);
 CREATE POLICY "Public read featured_works" ON featured_works FOR SELECT USING (true);
+CREATE POLICY "Public read portfolio_images" ON portfolio_images FOR SELECT USING (true);
 CREATE POLICY "Public read studio" ON studio FOR SELECT USING (true);
 
 -- Editor/Admin write access (assuming auth.uid() is in profiles table with appropriate role)
@@ -99,6 +110,11 @@ CREATE POLICY "Editors can delete tattoos" ON tattoos FOR DELETE USING (public.g
 CREATE POLICY "Editors can insert featured_works" ON featured_works FOR INSERT WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
 CREATE POLICY "Editors can update featured_works" ON featured_works FOR UPDATE USING (true) WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
 CREATE POLICY "Editors can delete featured_works" ON featured_works FOR DELETE USING (public.get_user_role() IN ('admin', 'editor'));
+
+-- Portfolio images policies
+CREATE POLICY "Editors can insert portfolio_images" ON portfolio_images FOR INSERT WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
+CREATE POLICY "Editors can update portfolio_images" ON portfolio_images FOR UPDATE USING (true) WITH CHECK (public.get_user_role() IN ('admin', 'editor'));
+CREATE POLICY "Editors can delete portfolio_images" ON portfolio_images FOR DELETE USING (public.get_user_role() IN ('admin', 'editor'));
 
 -- Studio policies
 CREATE POLICY "Editors can update studio" ON studio FOR UPDATE USING (true) WITH CHECK (public.get_user_role() IN ('admin', 'editor'));

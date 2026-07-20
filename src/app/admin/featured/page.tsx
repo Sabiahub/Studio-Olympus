@@ -16,6 +16,8 @@ export default function FeaturedPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [replacingId, setReplacingId] = useState<string | null>(null);
+  const [isReplacing, setIsReplacing] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -29,6 +31,7 @@ export default function FeaturedPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchWorks();
@@ -112,6 +115,67 @@ export default function FeaturedPage() {
     setPreviewUrl(URL.createObjectURL(file));
   };
 
+  const handleReplaceImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !replacingId) return;
+
+    try {
+      setIsReplacing(true);
+      const compressedFile = await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true
+      });
+
+      const fileExt = compressedFile.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `featured/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('olympus')
+        .upload(filePath, compressedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('olympus')
+        .getPublicUrl(filePath);
+
+      const { data, error } = await supabase
+        .from('featured_works')
+        .update({ image_url: publicUrl })
+        .eq('id', replacingId)
+        .select();
+
+      if (error || !data || data.length === 0) {
+        throw new Error(error?.message || 'Permissão negada ou registro não encontrado.');
+      }
+
+      // Delete old image
+      const work = works.find(w => w.id === replacingId);
+      if (work?.image_url) {
+        try {
+          const url = new URL(work.image_url);
+          const pathParts = url.pathname.split('/olympus/');
+          if (pathParts.length > 1) {
+            await supabase.storage.from('olympus').remove([pathParts[1]]);
+          }
+        } catch (err) {
+          console.error("Failed to parse/delete old image URL", err);
+        }
+      }
+
+      fetchWorks();
+    } catch (error: any) {
+      console.error('Error replacing image:', error);
+      alert(`Erro ao substituir a imagem: ${error.message}`);
+    } finally {
+      setIsReplacing(false);
+      setReplacingId(null);
+      if (replaceInputRef.current) replaceInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -173,12 +237,23 @@ export default function FeaturedPage() {
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="font-serif text-3xl text-olympus-gold">Trabalhos em Destaque</h1>
+        <h1 className="font-serif text-3xl text-olympus-gold flex items-center gap-4">
+          Trabalhos em Destaque
+          {isReplacing && <Loader2 className="animate-spin text-olympus-gold" size={20} />}
+        </h1>
         <Button className="gap-2" onClick={openNewModal}>
           <Plus size={18} />
           Novo Destaque
         </Button>
       </div>
+      
+      <input 
+        type="file" 
+        accept="image/*" 
+        className="hidden" 
+        ref={replaceInputRef}
+        onChange={handleReplaceImage}
+      />
 
       <div className="bg-olympus-graphite border border-olympus-gold/10 rounded-sm overflow-hidden min-h-[500px]">
         {loading ? (
@@ -220,10 +295,17 @@ export default function FeaturedPage() {
                       <MoreHorizontal size={18} />
                     </button>
                     {openDropdownId === work.id && (
-                      <div className={`absolute right-4 w-32 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= works.length - 2 && works.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
-                        <button onClick={() => openEditModal(work)} className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-white">Editar</button>
-                        <button onClick={() => handleDelete(work.id)} className="text-left px-4 py-2 text-sm hover:bg-olympus-wine/20 text-olympus-wine">Excluir</button>
-                      </div>
+                      <>
+                        <div 
+                          className="fixed inset-0 z-40" 
+                          onClick={() => setOpenDropdownId(null)}
+                        ></div>
+                        <div className={`absolute right-4 w-36 bg-olympus-graphite border border-olympus-gold/20 shadow-xl rounded-sm z-50 flex flex-col overflow-hidden ${index >= works.length - 2 && works.length > 3 ? 'bottom-10 mb-2' : 'top-10 mt-2'}`}>
+                          <button onClick={() => { setReplacingId(work.id); setOpenDropdownId(null); replaceInputRef.current?.click(); }} className="text-left px-4 py-2 text-sm hover:bg-olympus-gold/10 text-olympus-gold">Substituir</button>
+                          <button onClick={() => openEditModal(work)} className="text-left px-4 py-2 text-sm hover:bg-olympus-white/5 text-olympus-white border-t border-olympus-white/5">Editar</button>
+                          <button onClick={() => handleDelete(work.id)} className="text-left px-4 py-2 text-sm hover:bg-olympus-wine/20 text-olympus-wine">Excluir</button>
+                        </div>
+                      </>
                     )}
                   </td>
                 </tr>
