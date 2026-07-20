@@ -109,12 +109,12 @@ export default function GuestSection({ guests, whatsapp }: { guests: any[], what
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md overflow-y-auto"
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-8 bg-black/95 md:bg-black/90 md:backdrop-blur-md overflow-y-auto"
             onClick={() => setSelectedId(null)}
           >
             <motion.div
               layoutId={`guest-card-${selectedId}`}
-              className="w-full max-w-5xl bg-olympus-green rounded-3xl overflow-hidden shadow-2xl relative flex flex-col my-auto max-h-[90vh] border border-olympus-gold/30 text-left"
+              className="w-full max-w-5xl bg-olympus-green rounded-3xl overflow-hidden shadow-2xl relative flex flex-col my-auto h-[90dvh] md:h-auto md:max-h-[90vh] border border-olympus-gold/30 text-left"
               onClick={(e) => e.stopPropagation()}
             >
               <button
