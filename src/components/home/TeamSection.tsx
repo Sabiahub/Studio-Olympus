@@ -156,7 +156,7 @@ export default function TeamSection({ team }: { team: any[] }) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.3 }}
-                      className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                     >
                       {[...selectedArtist.portfolio_images]
                         .sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
@@ -166,7 +166,7 @@ export default function TeamSection({ team }: { team: any[] }) {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 * index, duration: 0.4 }}
-                          className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors aspect-[4/5] cursor-pointer"
+                          className="rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors aspect-[4/5] cursor-pointer"
                           onClick={() => setSelectedPortfolioImage(img.image_url)}
                         >
                           <img
