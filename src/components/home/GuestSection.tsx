@@ -189,12 +189,12 @@ export default function GuestSection({ guests, whatsapp }: { guests: any[], what
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 * index, duration: 0.4 }}
-                        className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors md:aspect-[4/5]"
+                        className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors aspect-[4/5]"
                       >
                         <img
                           src={img.image_url}
                           alt={`${selectedGuest.name} portfolio ${index + 1}`}
-                          className="w-full object-cover hover:scale-105 transition-transform duration-500 h-auto md:h-full"
+                          className="w-full object-cover hover:scale-105 transition-transform duration-500 h-full"
                           loading="lazy"
                         />
                       </motion.div>
