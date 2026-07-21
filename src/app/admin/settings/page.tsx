@@ -15,7 +15,10 @@ export default function SettingsPage() {
     description: '',
     whatsapp: '',
     hero_image: '',
-    about_image: ''
+    about_image: '',
+    hero_media_type: 'image',
+    hero_youtube_id: '',
+    youtube_url_input: ''
   });
 
   const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
@@ -39,12 +42,38 @@ export default function SettingsPage() {
         description: data.description || '',
         whatsapp: data.whatsapp || '',
         hero_image: data.hero_image || '',
-        about_image: data.about_image || ''
+        about_image: data.about_image || '',
+        hero_media_type: data.hero_media_type || 'image',
+        hero_youtube_id: data.hero_youtube_id || '',
+        youtube_url_input: data.hero_youtube_id ? `https://youtube.com/watch?v=${data.hero_youtube_id}` : ''
       });
       setHeroPreview(data.hero_image || null);
       setAboutPreview(data.about_image || null);
     }
     setLoading(false);
+  };
+
+  const extractYouTubeID = (url: string) => {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  };
+
+  const handleYoutubeUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setFormData(prev => ({ ...prev, youtube_url_input: url }));
+    
+    if (!url) {
+      setFormData(prev => ({ ...prev, hero_youtube_id: '' }));
+      return;
+    }
+
+    const id = extractYouTubeID(url);
+    if (id) {
+      setFormData(prev => ({ ...prev, hero_youtube_id: id }));
+    } else {
+      setFormData(prev => ({ ...prev, hero_youtube_id: '' }));
+    }
   };
 
   const handleHeroChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,7 +130,15 @@ export default function SettingsPage() {
         whatsapp: formData.whatsapp,
         hero_image: heroUrl,
         about_image: aboutUrl,
+        hero_media_type: formData.hero_media_type,
+        hero_youtube_id: formData.hero_youtube_id,
       };
+
+      if (formData.hero_media_type === 'video' && formData.youtube_url_input && !formData.hero_youtube_id) {
+        alert('Por favor, insira uma URL de YouTube válida antes de salvar.');
+        setSaving(false);
+        return;
+      }
 
       const { data } = await supabase.from('studio').select('id');
       if (data && data.length > 0) {
@@ -141,21 +178,63 @@ export default function SettingsPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label className="block text-xs font-mono text-olympus-white/50 uppercase tracking-widest mb-2">Imagem Principal (Hero)</label>
-              <div 
-                className="border-2 border-dashed border-olympus-gold/20 rounded-sm h-64 flex flex-col items-center justify-center bg-olympus-black/50 hover:bg-olympus-black cursor-pointer transition-colors relative overflow-hidden"
-                onClick={() => heroInputRef.current?.click()}
-              >
-                {heroPreview ? (
-                  <img src={heroPreview} alt="Hero Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="flex flex-col items-center text-olympus-white/40">
-                    <Upload size={32} className="mb-2" />
-                    <span className="text-sm font-sans">Enviar Imagem</span>
-                  </div>
-                )}
-                <input type="file" accept="image/*" className="hidden" ref={heroInputRef} onChange={handleHeroChange} />
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-mono text-olympus-white/50 uppercase tracking-widest">Plano de Fundo (Hero)</label>
+                <div className="flex gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setFormData(prev => ({...prev, hero_media_type: 'image'}))}
+                    className={`text-xs px-3 py-1 rounded-sm border ${formData.hero_media_type === 'image' ? 'border-olympus-gold text-olympus-gold bg-olympus-gold/10' : 'border-olympus-gold/20 text-olympus-white/50 hover:bg-olympus-white/5'}`}
+                  >
+                    Imagem
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setFormData(prev => ({...prev, hero_media_type: 'video'}))}
+                    className={`text-xs px-3 py-1 rounded-sm border ${formData.hero_media_type === 'video' ? 'border-olympus-gold text-olympus-gold bg-olympus-gold/10' : 'border-olympus-gold/20 text-olympus-white/50 hover:bg-olympus-white/5'}`}
+                  >
+                    Vídeo
+                  </button>
+                </div>
               </div>
+
+              {formData.hero_media_type === 'image' ? (
+                <div 
+                  className="border-2 border-dashed border-olympus-gold/20 rounded-sm h-64 flex flex-col items-center justify-center bg-olympus-black/50 hover:bg-olympus-black cursor-pointer transition-colors relative overflow-hidden"
+                  onClick={() => heroInputRef.current?.click()}
+                >
+                  {heroPreview ? (
+                    <img src={heroPreview} alt="Hero Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex flex-col items-center text-olympus-white/40">
+                      <Upload size={32} className="mb-2" />
+                      <span className="text-sm font-sans">Enviar Imagem</span>
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" className="hidden" ref={heroInputRef} onChange={handleHeroChange} />
+                </div>
+              ) : (
+                <div className="h-64 flex flex-col justify-center bg-olympus-black/30 border border-olympus-gold/10 rounded-sm p-6">
+                  <label className="block text-sm text-olympus-white mb-2">URL do Vídeo no YouTube</label>
+                  <input 
+                    type="text" 
+                    placeholder="https://youtube.com/watch?v=..." 
+                    value={formData.youtube_url_input} 
+                    onChange={handleYoutubeUrlChange} 
+                    className={`w-full bg-olympus-black border ${formData.youtube_url_input && !formData.hero_youtube_id ? 'border-olympus-wine focus:border-olympus-wine' : 'border-olympus-gold/20 focus:border-olympus-gold'} rounded-sm px-4 py-3 text-olympus-white focus:outline-none`} 
+                  />
+                  {formData.youtube_url_input && !formData.hero_youtube_id && (
+                    <p className="text-olympus-wine text-xs mt-2 font-mono">URL inválida ou ID não encontrado.</p>
+                  )}
+                  {formData.hero_youtube_id && (
+                    <p className="text-green-400 text-xs mt-2 font-mono">ID detectado: {formData.hero_youtube_id}</p>
+                  )}
+                  <p className="text-olympus-white/40 text-xs mt-4">
+                    O vídeo deve ser hospedado no YouTube (preferencialmente como 'Não Listado'). 
+                    Ele será exibido em tela cheia, sem áudio, em loop infinito.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div>
