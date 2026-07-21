@@ -6,7 +6,7 @@ import TattoosSection from '@/components/home/TattoosSection';
 import GuestSection from '@/components/home/GuestSection';
 import TeamSection from '@/components/home/TeamSection';
 
-export const revalidate = 60; // ISR every 60 seconds
+export const revalidate = 0; // Disable cache so admin changes reflect instantly
 
 export default async function HomePage() {
   const today = new Date().toISOString().split('T')[0];

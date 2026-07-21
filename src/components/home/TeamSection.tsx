@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 
 export default function TeamSection({ team }: { team: any[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedPortfolioImage, setSelectedPortfolioImage] = useState<string | null>(null);
 
   const selectedArtist = team.find((a) => a.id === selectedId);
 
@@ -165,7 +166,8 @@ export default function TeamSection({ team }: { team: any[] }) {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 * index, duration: 0.4 }}
-                          className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors aspect-[4/5]"
+                          className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors aspect-[4/5] cursor-pointer"
+                          onClick={() => setSelectedPortfolioImage(img.image_url)}
                         >
                           <img
                             src={img.image_url}
@@ -184,6 +186,38 @@ export default function TeamSection({ team }: { team: any[] }) {
                   )}
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Fullscreen Portfolio Image Modal */}
+      <AnimatePresence>
+        {selectedPortfolioImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-black/95 backdrop-blur-sm"
+            onClick={() => setSelectedPortfolioImage(null)}
+          >
+            <button
+              className="absolute top-6 right-6 z-20 p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full text-olympus-gold transition-colors border border-olympus-gold/30"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedPortfolioImage(null);
+              }}
+            >
+              <X size={24} />
+            </button>
+            <motion.img
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              src={selectedPortfolioImage}
+              alt="Arte expandida"
+              className="max-w-full max-h-full object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
           </motion.div>
         )}
       </AnimatePresence>
