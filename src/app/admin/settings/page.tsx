@@ -49,6 +49,19 @@ export default function SettingsPage() {
       });
       setHeroPreview(data.hero_image || null);
       setAboutPreview(data.about_image || null);
+    } else {
+      // Fallbacks to show the user what is currently active on the live site
+      setFormData({
+        title: 'Olympus',
+        description: 'O Melhor Estúdio de Tatuagem de Belo Horizonte',
+        whatsapp: '',
+        hero_image: 'https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?q=80&w=2000',
+        about_image: '',
+        hero_media_type: 'image',
+        hero_youtube_id: '',
+        youtube_url_input: ''
+      });
+      setHeroPreview('https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?q=80&w=2000');
     }
     setLoading(false);
   };
@@ -122,7 +135,6 @@ export default function SettingsPage() {
       let aboutUrl = formData.about_image;
 
       if (heroImageFile) heroUrl = await uploadImage(heroImageFile, 'hero');
-      if (aboutImageFile) aboutUrl = await uploadImage(aboutImageFile, 'about');
 
       const payload = {
         title: formData.title,
@@ -176,7 +188,7 @@ export default function SettingsPage() {
       <div className="bg-olympus-graphite border border-olympus-gold/10 rounded-sm overflow-hidden p-6 md:p-8">
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-8">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-mono text-olympus-white/50 uppercase tracking-widest">Plano de Fundo (Hero)</label>
@@ -235,24 +247,6 @@ export default function SettingsPage() {
                   </p>
                 </div>
               )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-mono text-olympus-white/50 uppercase tracking-widest mb-2">Imagem Sobre Nós</label>
-              <div 
-                className="border-2 border-dashed border-olympus-gold/20 rounded-sm h-64 flex flex-col items-center justify-center bg-olympus-black/50 hover:bg-olympus-black cursor-pointer transition-colors relative overflow-hidden"
-                onClick={() => aboutInputRef.current?.click()}
-              >
-                {aboutPreview ? (
-                  <img src={aboutPreview} alt="About Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="flex flex-col items-center text-olympus-white/40">
-                    <Upload size={32} className="mb-2" />
-                    <span className="text-sm font-sans">Enviar Imagem</span>
-                  </div>
-                )}
-                <input type="file" accept="image/*" className="hidden" ref={aboutInputRef} onChange={handleAboutChange} />
-              </div>
             </div>
           </div>
 
