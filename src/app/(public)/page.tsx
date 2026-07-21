@@ -16,7 +16,8 @@ export default async function HomePage() {
     { data: tattoosData },
     { data: featuredWorksData },
     { data: studioData },
-    { data: guestData }
+    { data: guestData },
+    { data: galleryData }
   ] = await Promise.all([
     supabase.from('artists').select('*, portfolio_images(*)').eq('active', true).eq('is_guest', false).order('display_order'),
     supabase.from('tattoos').select('*, artists(name)').order('created_at', { ascending: false }),
@@ -29,7 +30,8 @@ export default async function HomePage() {
       .eq('active', true)
       .lte('guest_start', today)
       .or(`guest_end.is.null,guest_end.gte.${today}`)
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: true }),
+    supabase.from('studio_gallery').select('*').order('display_order', { ascending: true })
   ]);
 
   if (!tattoosData || tattoosData.length === 0) {
@@ -44,11 +46,12 @@ export default async function HomePage() {
   const featuredWorks = featuredWorksData || [];
   const studio = studioData || { whatsapp: '5531982873734' };
   const activeGuests = guestData && guestData.length > 0 ? guestData : [];
+  const studioGallery = galleryData || [];
 
   return (
     <div>
       <HeroSection studio={studio} />
-      <AboutSection studio={studio} />
+      <AboutSection studio={studio} gallery={studioGallery} />
       <FeaturedWorksSection works={featuredWorks} />
       <TattoosSection tattoos={tattoos} whatsapp={studio.whatsapp} />
       {activeGuests.length > 0 && <GuestSection guests={activeGuests} whatsapp={studio.whatsapp} />}

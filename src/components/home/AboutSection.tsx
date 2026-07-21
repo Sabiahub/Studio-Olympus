@@ -1,4 +1,18 @@
-export default function AboutSection({ studio }: { studio: any }) {
+export default function AboutSection({ studio, gallery }: { studio: any, gallery?: any[] }) {
+  // ATENÇÃO: NÃO REMOVA AS IMAGENS DA PASTA public/photos/WEB.Studio/!
+  // Elas são usadas como fallback de segurança caso a galeria do banco de dados (studio_gallery) esteja vazia.
+  // Isso garante que o site nunca fique quebrado se o admin excluir todas as fotos.
+  const fallbackImages = [
+    "/photos/WEB.Studio/31.webp", "/photos/WEB.Studio/32.webp", "/photos/WEB.Studio/33.webp", 
+    "/photos/WEB.Studio/34.webp", "/photos/WEB.Studio/35.webp", "/photos/WEB.Studio/36.webp", 
+    "/photos/WEB.Studio/37.webp", "/photos/WEB.Studio/38.webp", "/photos/WEB.Studio/39.webp", 
+    "/photos/WEB.Studio/40.webp", "/photos/WEB.Studio/41.webp"
+  ];
+
+  const imagesToDisplay = gallery && gallery.length > 0 
+    ? gallery.map(img => img.image_url) 
+    : fallbackImages;
+
   return (
     <section id="about" className="py-8 md:py-16 relative bg-olympus-green">
       <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/black-marble.png")' }}></div>
@@ -24,11 +38,8 @@ export default function AboutSection({ studio }: { studio: any }) {
                 {/* Dobramos o array de imagens para criar o loop contínuo perfeito */}
                 {[...Array(2)].map((_, i) => (
                   <div key={i} className="flex">
-                    {[
-                      "31.webp", "32.webp", "33.webp", "34.webp", "35.webp", 
-                      "36.webp", "37.webp", "38.webp", "39.webp", "40.webp", "41.webp"
-                    ].map((img, idx) => (
-                      <img key={idx} src={`/photos/WEB.Studio/${img}`} alt={`Studio Olympus Interior ${idx + 1}`} className="w-64 md:w-80 h-48 md:h-64 object-cover shrink-0 mr-4 rounded-sm border border-olympus-gold/20" />
+                    {imagesToDisplay.map((img, idx) => (
+                      <img key={idx} src={img} alt={`Studio Olympus Interior ${idx + 1}`} className="w-64 md:w-80 h-48 md:h-64 object-cover shrink-0 mr-4 rounded-sm border border-olympus-gold/20" />
                     ))}
                   </div>
                 ))}

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, Plus, Image as ImageIcon, X, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 
 export default function SettingsPage() {
@@ -28,6 +28,11 @@ export default function SettingsPage() {
 
   const heroInputRef = useRef<HTMLInputElement>(null);
   const aboutInputRef = useRef<HTMLInputElement>(null);
+  
+  // Gallery state
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -35,7 +40,16 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     setLoading(true);
-    const { data } = await supabase.from('studio').select('*').single();
+    const [studioRes, galleryRes] = await Promise.all([
+      supabase.from('studio').select('*').single(),
+      supabase.from('studio_gallery').select('*').order('display_order', { ascending: true })
+    ]);
+    
+    if (galleryRes.data) {
+      setGalleryImages(galleryRes.data);
+    }
+    
+    const data = studioRes.data;
     if (data) {
       setFormData({
         title: data.title || '',
@@ -86,6 +100,115 @@ export default function SettingsPage() {
       setFormData(prev => ({ ...prev, hero_youtube_id: id }));
     } else {
       setFormData(prev => ({ ...prev, hero_youtube_id: '' }));
+    }
+  };
+
+  const fetchGallery = async () => {
+    const { data } = await supabase.from('studio_gallery').select('*').order('display_order', { ascending: true });
+    if (data) setGalleryImages(data);
+  };
+
+  const handleAddGalleryImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    setIsUploadingGallery(true);
+    
+    try {
+      let maxOrder = 0;
+      if (galleryImages.length > 0) {
+        maxOrder = Math.max(...galleryImages.map(img => img.display_order || 0));
+      }
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        const compressedFile = await imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true
+        });
+
+        const fileExt = compressedFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `about/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('olympus')
+          .upload(filePath, compressedFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('olympus')
+          .getPublicUrl(filePath);
+          
+        const nextOrder = maxOrder + 1 + i;
+
+        const { data, error } = await supabase.from('studio_gallery').insert({
+          image_url: publicUrl,
+          display_order: nextOrder
+        }).select();
+
+        if (error || !data || data.length === 0) {
+          throw new Error(error?.message || 'Erro ao inserir imagem no banco.');
+        }
+      }
+      
+      await fetchGallery();
+    } catch (error) {
+      console.error('Error uploading to gallery:', error);
+      alert('Erro ao fazer upload da imagem.');
+    } finally {
+      setIsUploadingGallery(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteGalleryImage = async (id: string, imageUrl: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta imagem da galeria?')) return;
+    
+    try {
+      const url = new URL(imageUrl);
+      const pathParts = url.pathname.split('/olympus/');
+      if (pathParts.length > 1) {
+        await supabase.storage.from('olympus').remove([pathParts[1]]);
+      }
+    } catch (e) {
+      console.error("Failed to delete from storage", e);
+    }
+
+    await supabase.from('studio_gallery').delete().eq('id', id);
+    await fetchGallery();
+  };
+
+  const moveGalleryImage = async (index: number, direction: 'up' | 'down') => {
+    if (
+      (direction === 'up' && index === 0) || 
+      (direction === 'down' && index === galleryImages.length - 1)
+    ) return;
+
+    const newGallery = [...galleryImages];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    
+    // Swap array positions
+    const temp = newGallery[index];
+    newGallery[index] = newGallery[targetIndex];
+    newGallery[targetIndex] = temp;
+    
+    // Update display_order based on array position
+    const updatedItems = newGallery.map((item, idx) => ({
+      ...item,
+      display_order: idx
+    }));
+    
+    setGalleryImages(updatedItems);
+
+    // Save to DB
+    for (const item of updatedItems) {
+      await supabase.from('studio_gallery')
+        .update({ display_order: item.display_order })
+        .eq('id', item.id);
     }
   };
 
@@ -273,6 +396,71 @@ export default function SettingsPage() {
             </Button>
           </div>
         </form>
+      </div>
+
+      {/* Gallery Section */}
+      <div className="mt-8 bg-olympus-graphite border border-olympus-gold/10 rounded-sm overflow-hidden p-6 md:p-8">
+        <h2 className="font-serif text-xl text-olympus-gold mb-6 uppercase tracking-widest">Galeria "Sobre Nós" (Letreiro Animado)</h2>
+        <p className="text-sm text-olympus-white/60 mb-6 font-light">
+          Adicione as fotos do estúdio que aparecerão deslizando no letreiro animado da Home. 
+          Use as setas para reorganizar a ordem.
+        </p>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
+          {galleryImages.map((img, index) => (
+            <div key={img.id} className="relative group rounded-sm overflow-hidden border border-olympus-gold/20 aspect-square">
+              <img src={img.image_url} alt="Gallery image" className="w-full h-full object-cover" />
+              
+              <div className="absolute inset-0 bg-olympus-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                <div className="flex justify-between">
+                  <button 
+                    onClick={() => moveGalleryImage(index, 'up')}
+                    disabled={index === 0}
+                    className={`p-1 rounded-sm ${index === 0 ? 'text-olympus-white/20' : 'text-olympus-white hover:bg-olympus-white/20'}`}
+                  >
+                    <ArrowUp size={16} />
+                  </button>
+                  <button 
+                    onClick={() => moveGalleryImage(index, 'down')}
+                    disabled={index === galleryImages.length - 1}
+                    className={`p-1 rounded-sm ${index === galleryImages.length - 1 ? 'text-olympus-white/20' : 'text-olympus-white hover:bg-olympus-white/20'}`}
+                  >
+                    <ArrowDown size={16} />
+                  </button>
+                </div>
+                <button 
+                  onClick={() => handleDeleteGalleryImage(img.id, img.image_url)}
+                  className="p-1 text-red-400 hover:bg-red-400/20 rounded-sm self-end"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          <div 
+            onClick={() => !isUploadingGallery && galleryInputRef.current?.click()}
+            className={`border-2 border-dashed border-olympus-gold/20 rounded-sm aspect-square flex flex-col items-center justify-center transition-colors ${isUploadingGallery ? 'opacity-50 cursor-not-allowed bg-olympus-black/50' : 'cursor-pointer hover:bg-olympus-black/50 hover:border-olympus-gold/50'}`}
+          >
+            {isUploadingGallery ? (
+              <Loader2 className="animate-spin text-olympus-gold mb-2" size={24} />
+            ) : (
+              <Plus className="text-olympus-gold/50 mb-2" size={24} />
+            )}
+            <span className="text-xs font-mono text-olympus-white/50 uppercase tracking-widest text-center px-2 mt-1 leading-tight">
+              {isUploadingGallery ? 'Enviando...' : 'Adicionar Fotos'}
+            </span>
+          </div>
+          <input 
+            type="file" 
+            accept="image/*" 
+            multiple 
+            className="hidden" 
+            ref={galleryInputRef} 
+            onChange={handleAddGalleryImage} 
+            disabled={isUploadingGallery}
+          />
+        </div>
       </div>
     </div>
   );
