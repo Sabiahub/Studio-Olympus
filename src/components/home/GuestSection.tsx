@@ -54,13 +54,13 @@ export default function GuestSection({ guests, whatsapp }: { guests: any[], what
               >
                 <div className="w-64 md:w-80 lg:w-96 mb-2 relative mx-auto">
                    {guest.photo_url && (
-                     <div className="w-full aspect-[3/4] rounded-3xl border border-olympus-gold/30 overflow-hidden relative shadow-2xl shadow-black group-hover:border-olympus-gold/60 transition-colors duration-500">
+                     <div className="w-full aspect-[3/4] rounded-t-[120px] md:rounded-t-[180px] border border-olympus-gold/30 overflow-hidden relative shadow-2xl shadow-black group-hover:border-olympus-gold/60 transition-colors duration-500">
                        <div className="w-full h-full group-hover:scale-105 transition-transform duration-700">
                          <motion.img 
                            layoutId={`guest-image-${guest.id}`}
                            src={guest.photo_url} 
                            alt={guest.name} 
-                           className="w-full h-full object-cover object-top transition-[filter] duration-700" 
+                           className="w-full h-full object-cover object-top transition-[filter] duration-700 rounded-t-[120px] md:rounded-t-[180px]" 
                            style={{filter: 'grayscale(1) sepia(0.5) hue-rotate(5deg) contrast(1.2)'}} 
                          />
                        </div>
