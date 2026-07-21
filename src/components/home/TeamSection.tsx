@@ -148,32 +148,36 @@ export default function TeamSection({ team }: { team: any[] }) {
               <div className="p-8 overflow-y-auto bg-olympus-green-light flex-1">
                 <h3 className="text-2xl font-serif text-olympus-gold mb-6 tracking-widest uppercase">Portfólio</h3>
                 
-                {(!selectedArtist.portfolio_images || selectedArtist.portfolio_images.length === 0) ? (
-                  <div className="flex items-center justify-center py-12 text-white/50 italic font-light">
-                    Portfólio em breve...
-                  </div>
-                ) : (
-                  <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-                    {[...selectedArtist.portfolio_images]
-                      .sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
-                      .map((img: any, index: number) => (
-                      <motion.div
-                        key={img.id || index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 * index, duration: 0.4 }}
-                        className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors aspect-[4/5]"
-                      >
-                        <img
-                          src={img.image_url}
-                          alt={`${selectedArtist.name} portfolio ${index + 1}`}
-                          className="w-full object-cover hover:scale-105 transition-transform duration-500 h-full"
-                          loading="lazy"
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
+                {/* {selectedArtist.portfolio_images && selectedArtist.portfolio_images.length > 0 ? (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
+                    >
+                      {selectedArtist.portfolio_images.map((img: any, index: number) => (
+                        <motion.div
+                          key={img.id || index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 * index, duration: 0.4 }}
+                          className="break-inside-avoid rounded-xl overflow-hidden border border-olympus-gold/10 hover:border-olympus-gold/30 transition-colors aspect-[4/5]"
+                        >
+                          <img
+                            src={img.image_url}
+                            alt={`${selectedArtist.name} portfolio ${index + 1}`}
+                            className="w-full object-cover hover:scale-105 transition-transform duration-500 h-full"
+                            loading="lazy"
+                          />
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  ) : ( */}
+                    <div className="flex flex-col items-center justify-center py-12 text-olympus-white/50">
+                      <p className="font-serif text-xl mb-2 text-olympus-gold">Portfólio em breve</p>
+                      <p className="text-sm">Mais trabalhos serão adicionados em breve.</p>
+                    </div>
+                  {/* )} */}
               </div>
             </motion.div>
           </motion.div>
