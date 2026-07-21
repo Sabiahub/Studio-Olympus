@@ -33,6 +33,7 @@ export default function SettingsPage() {
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -45,8 +46,24 @@ export default function SettingsPage() {
       supabase.from('studio_gallery').select('*').order('display_order', { ascending: true })
     ]);
     
-    if (galleryRes.data) {
+    if (galleryRes.data && galleryRes.data.length > 0) {
       setGalleryImages(galleryRes.data);
+    } else {
+      // Auto-seed if empty
+      const fallbackImages = [
+        "/photos/WEB.Studio/31.webp", "/photos/WEB.Studio/32.webp", "/photos/WEB.Studio/33.webp", 
+        "/photos/WEB.Studio/34.webp", "/photos/WEB.Studio/35.webp", "/photos/WEB.Studio/36.webp", 
+        "/photos/WEB.Studio/37.webp", "/photos/WEB.Studio/38.webp", "/photos/WEB.Studio/39.webp", 
+        "/photos/WEB.Studio/40.webp", "/photos/WEB.Studio/41.webp"
+      ];
+      const payload = fallbackImages.map((url, index) => ({
+        image_url: url,
+        display_order: index
+      }));
+      const { data: insertedData } = await supabase.from('studio_gallery').insert(payload).select();
+      if (insertedData) {
+        setGalleryImages(insertedData.sort((a, b) => (a.display_order || 0) - (b.display_order || 0)));
+      }
     }
     
     const data = studioRes.data;
@@ -205,6 +222,44 @@ export default function SettingsPage() {
     setGalleryImages(updatedItems);
 
     // Save to DB
+    for (const item of updatedItems) {
+      await supabase.from('studio_gallery')
+        .update({ display_order: item.display_order })
+        .eq('id', item.id);
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    const newGallery = [...galleryImages];
+    const draggedItem = newGallery[draggedIndex];
+    
+    newGallery.splice(draggedIndex, 1);
+    newGallery.splice(dropIndex, 0, draggedItem);
+    
+    const updatedItems = newGallery.map((item, idx) => ({
+      ...item,
+      display_order: idx
+    }));
+    
+    setGalleryImages(updatedItems);
+    setDraggedIndex(null);
+
     for (const item of updatedItems) {
       await supabase.from('studio_gallery')
         .update({ display_order: item.display_order })
@@ -400,16 +455,29 @@ export default function SettingsPage() {
 
       {/* Gallery Section */}
       <div className="mt-8 bg-olympus-graphite border border-olympus-gold/10 rounded-sm overflow-hidden p-6 md:p-8">
-        <h2 className="font-serif text-xl text-olympus-gold mb-6 uppercase tracking-widest">Galeria "Sobre Nós" (Letreiro Animado)</h2>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <h2 className="font-serif text-xl text-olympus-gold uppercase tracking-widest">Galeria "Sobre Nós" (Letreiro)</h2>
+          <span className="text-xs bg-olympus-gold/10 text-olympus-gold px-3 py-1 rounded-sm mt-2 md:mt-0 font-mono border border-olympus-gold/20">
+            ✅ Salvo automaticamente
+          </span>
+        </div>
+        
         <p className="text-sm text-olympus-white/60 mb-6 font-light">
           Adicione as fotos do estúdio que aparecerão deslizando no letreiro animado da Home. 
-          Use as setas para reorganizar a ordem.
+          <strong> Clique e arraste</strong> uma foto para reorganizar a ordem, ou use as setas.
         </p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
           {galleryImages.map((img, index) => (
-            <div key={img.id} className="relative group rounded-sm overflow-hidden border border-olympus-gold/20 aspect-square">
-              <img src={img.image_url} alt="Gallery image" className="w-full h-full object-cover" />
+            <div 
+              key={img.id} 
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDrop={(e) => handleDrop(e, index)}
+              className={`relative group rounded-sm overflow-hidden border ${draggedIndex === index ? 'border-olympus-gold opacity-50' : 'border-olympus-gold/20'} aspect-square cursor-grab active:cursor-grabbing`}
+            >
+              <img src={img.image_url} alt="Gallery image" className="w-full h-full object-cover pointer-events-none" />
               
               <div className="absolute inset-0 bg-olympus-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
                 <div className="flex justify-between">
