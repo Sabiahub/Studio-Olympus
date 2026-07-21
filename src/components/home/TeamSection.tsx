@@ -62,8 +62,9 @@ export default function TeamSection({ team }: { team: any[] }) {
                   <a 
                     href={artist.instagram.startsWith('http') ? artist.instagram : `https://www.instagram.com/${artist.instagram.replace('@', '')}`} 
                     target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-xs md:text-sm text-white/80 hover:text-olympus-gold transition-colors inline-flex items-center justify-center relative z-10"
+                    rel="noopener noreferrer"
+                    title={artist.instagram}
+                    className="text-xs md:text-sm text-white/80 hover:text-olympus-gold transition-colors block truncate w-full relative z-10"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {artist.instagram.startsWith('@') ? artist.instagram : `@${artist.instagram}`}
