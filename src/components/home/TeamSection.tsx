@@ -32,7 +32,6 @@ export default function TeamSection({ team }: { team: any[] }) {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
           {team.map((artist) => (
             <motion.div 
-              layoutId={`team-card-${artist.id}`}
               key={artist.id} 
               onClick={() => setSelectedId(artist.id)}
               className="relative group rounded-3xl overflow-hidden bg-olympus-green-light border border-olympus-gold/10 hover:border-olympus-gold/40 transition-colors transition-shadow duration-500 shadow-lg hover:shadow-2xl cursor-pointer"
@@ -87,7 +86,9 @@ export default function TeamSection({ team }: { team: any[] }) {
             onClick={() => setSelectedId(null)}
           >
             <motion.div
-              layoutId={`team-card-${selectedId}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="w-full max-w-5xl bg-olympus-green rounded-3xl overflow-hidden shadow-2xl relative flex flex-col my-auto h-[90dvh] md:h-auto md:max-h-[90vh] border border-olympus-gold/20"
               onClick={(e) => e.stopPropagation()}
             >
@@ -148,14 +149,16 @@ export default function TeamSection({ team }: { team: any[] }) {
               <div className="p-8 overflow-y-auto bg-olympus-green-light flex-1">
                 <h3 className="text-2xl font-serif text-olympus-gold mb-6 tracking-widest uppercase">Portfólio</h3>
                 
-                {/* {selectedArtist.portfolio_images && selectedArtist.portfolio_images.length > 0 ? (
+                {selectedArtist.portfolio_images && selectedArtist.portfolio_images.length > 0 ? (
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.3 }}
                       className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
                     >
-                      {selectedArtist.portfolio_images.map((img: any, index: number) => (
+                      {[...selectedArtist.portfolio_images]
+                        .sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
+                        .map((img: any, index: number) => (
                         <motion.div
                           key={img.id || index}
                           initial={{ opacity: 0, y: 20 }}
@@ -172,12 +175,12 @@ export default function TeamSection({ team }: { team: any[] }) {
                         </motion.div>
                       ))}
                     </motion.div>
-                  ) : ( */}
+                  ) : (
                     <div className="flex flex-col items-center justify-center py-12 text-olympus-white/50">
                       <p className="font-serif text-xl mb-2 text-olympus-gold">Portfólio em breve</p>
                       <p className="text-sm">Mais trabalhos serão adicionados em breve.</p>
                     </div>
-                  {/* )} */}
+                  )}
               </div>
             </motion.div>
           </motion.div>

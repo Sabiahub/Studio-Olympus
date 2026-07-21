@@ -47,7 +47,6 @@ export default function GuestSection({ guests, whatsapp }: { guests: any[], what
 
             return (
               <motion.div 
-                layoutId={`guest-card-${guest.id}`}
                 key={guest.id || index} 
                 onClick={() => setSelectedId(guest.id)}
                 className="flex flex-col items-center flex-1 cursor-pointer group"
@@ -113,7 +112,9 @@ export default function GuestSection({ guests, whatsapp }: { guests: any[], what
             onClick={() => setSelectedId(null)}
           >
             <motion.div
-              layoutId={`guest-card-${selectedId}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="w-full max-w-5xl bg-olympus-green rounded-3xl overflow-hidden shadow-2xl relative flex flex-col my-auto h-[90dvh] md:h-auto md:max-h-[90vh] border border-olympus-gold/30 text-left"
               onClick={(e) => e.stopPropagation()}
             >
