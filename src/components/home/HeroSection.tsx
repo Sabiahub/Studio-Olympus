@@ -35,16 +35,20 @@ export default function HeroSection({ studio }: { studio: any }) {
 
       {/* Video Loading Glassmorphism Effect */}
       {isVideo && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 1, 0] }}
-          transition={{ 
-            duration: 6.5, 
-            times: [0, 0.02, 0.92, 1], // 0s -> 0.13s -> 6s -> 6.5s
-            ease: "easeInOut" 
-          }}
-          className="absolute inset-0 z-[5] bg-olympus-black/60 backdrop-blur-2xl pointer-events-none"
-        />
+        <>
+          <style>{`
+            @keyframes glass-fade {
+              0% { opacity: 0; backdrop-filter: blur(0px); }
+              2% { opacity: 1; backdrop-filter: blur(24px); }
+              90% { opacity: 1; backdrop-filter: blur(24px); }
+              100% { opacity: 0; backdrop-filter: blur(0px); }
+            }
+            .animate-glass-fade {
+              animation: glass-fade 6.5s ease-in-out forwards;
+            }
+          `}</style>
+          <div className="absolute inset-0 z-[5] bg-black/70 pointer-events-none animate-glass-fade" />
+        </>
       )}
       
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">

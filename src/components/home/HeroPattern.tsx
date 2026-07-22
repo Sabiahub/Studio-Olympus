@@ -42,8 +42,10 @@ export default function HeroPattern() {
       float lines = abs(fract(f * 1.0) - 0.5);
       float mask  = smoothstep(0.45, 0.48, lines);
 
-      vec3 col = vec3(mask);
-      // use slightly transparent gold/white or just the user's mask, the user had vec4(col, 0.49)
+      // Gold color: #cba36d -> rgb(203, 163, 109) -> normalized (0.796, 0.639, 0.427)
+      vec3 gold = vec3(0.796, 0.639, 0.427);
+      vec3 col = gold * mask;
+      
       gl_FragColor = vec4(col, 0.49);
     }
     `;
