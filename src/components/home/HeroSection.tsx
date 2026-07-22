@@ -1,10 +1,12 @@
 "use client";
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import HeroPattern from './HeroPattern';
 
 export default function HeroSection({ studio }: { studio: any }) {
   const bgImage = studio?.hero_image || "https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?q=80&w=2000";
   const isVideo = studio?.hero_media_type === 'video' && !!studio?.hero_youtube_id;
+  const isPattern = studio?.hero_media_type === 'pattern';
   const videoId = studio?.hero_youtube_id;
 
   return (
@@ -19,6 +21,8 @@ export default function HeroSection({ studio }: { studio: any }) {
             title="Hero Video Background"
           ></iframe>
         </div>
+      ) : isPattern ? (
+        <HeroPattern />
       ) : (
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none"
@@ -28,6 +32,20 @@ export default function HeroSection({ studio }: { studio: any }) {
       
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-olympus-green/60 via-olympus-green/40 to-olympus-black pointer-events-none"></div>
+
+      {/* Video Loading Glassmorphism Effect */}
+      {isVideo && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 1, 0] }}
+          transition={{ 
+            duration: 6.5, 
+            times: [0, 0.02, 0.92, 1], // 0s -> 0.13s -> 6s -> 6.5s
+            ease: "easeInOut" 
+          }}
+          className="absolute inset-0 z-[5] bg-olympus-black/60 backdrop-blur-2xl pointer-events-none"
+        />
+      )}
       
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">
         <motion.div

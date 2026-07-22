@@ -385,6 +385,13 @@ export default function SettingsPage() {
                   >
                     Vídeo
                   </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setFormData(prev => ({...prev, hero_media_type: 'pattern'}))}
+                    className={`text-xs px-3 py-1 rounded-sm border ${formData.hero_media_type === 'pattern' ? 'border-olympus-gold text-olympus-gold bg-olympus-gold/10' : 'border-olympus-gold/20 text-olympus-white/50 hover:bg-olympus-white/5'}`}
+                  >
+                    Pattern
+                  </button>
                 </div>
               </div>
 
@@ -403,7 +410,7 @@ export default function SettingsPage() {
                   )}
                   <input type="file" accept="image/*" className="hidden" ref={heroInputRef} onChange={handleHeroChange} />
                 </div>
-              ) : (
+              ) : formData.hero_media_type === 'video' ? (
                 <div className="h-64 flex flex-col justify-center bg-olympus-black/30 border border-olympus-gold/10 rounded-sm p-6">
                   <label className="block text-sm text-olympus-white mb-2">URL do Vídeo no YouTube</label>
                   <input 
@@ -423,6 +430,11 @@ export default function SettingsPage() {
                     O vídeo deve ser hospedado no YouTube (preferencialmente como 'Não Listado'). 
                     Ele será exibido em tela cheia, sem áudio, em loop infinito.
                   </p>
+                </div>
+              ) : (
+                <div className="h-64 flex flex-col justify-center items-center bg-olympus-black/30 border border-olympus-gold/10 rounded-sm p-6 text-center">
+                  <p className="text-olympus-gold mb-2 font-serif text-lg">Pattern Ativado</p>
+                  <p className="text-olympus-white/50 text-sm">O fundo abstrato animado (WebGL) será exibido na Hero do site.</p>
                 </div>
               )}
             </div>
