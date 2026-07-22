@@ -7,6 +7,8 @@ import GuestSection from '@/components/home/GuestSection';
 import TeamSection from '@/components/home/TeamSection';
 
 export const revalidate = 0; // Disable cache so admin changes reflect instantly
+export const dynamic = 'force-dynamic'; // Ensures Vercel never caches this page
+export const fetchCache = 'force-no-store'; // Forces Supabase fetch to not be cached
 
 export default async function HomePage() {
   const today = new Date().toISOString().split('T')[0];
