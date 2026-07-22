@@ -42,7 +42,7 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     setLoading(true);
     const [studioRes, galleryRes] = await Promise.all([
-      supabase.from('studio').select('*').single(),
+      supabase.from('studio').select('*').limit(1),
       supabase.from('studio_gallery').select('*').order('display_order', { ascending: true })
     ]);
     
@@ -66,7 +66,7 @@ export default function SettingsPage() {
       }
     }
     
-    const data = studioRes.data;
+    const data = studioRes.data?.[0];
     if (data) {
       setFormData({
         title: data.title || '',

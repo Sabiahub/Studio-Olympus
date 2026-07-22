@@ -24,7 +24,7 @@ export default async function HomePage() {
     supabase.from('artists').select('*, portfolio_images(*)').eq('active', true).eq('is_guest', false).order('display_order'),
     supabase.from('tattoos').select('*, artists(name)').order('created_at', { ascending: false }),
     supabase.from('featured_works').select('*, artists(name)').order('display_order'),
-    supabase.from('studio').select('*').single(),
+    supabase.from('studio').select('*').limit(1),
     supabase
       .from('artists')
       .select('*, portfolio_images(*)')
@@ -46,7 +46,7 @@ export default async function HomePage() {
   const artists = artistsData || [];
   const tattoos = tattoosData || [];
   const featuredWorks = featuredWorksData || [];
-  const studio = studioData || { whatsapp: '5531982873734' };
+  const studio = (Array.isArray(studioData) ? studioData[0] : studioData) || { whatsapp: '5531982873734' };
   const activeGuests = guestData && guestData.length > 0 ? guestData : [];
   const studioGallery = galleryData || [];
 
